@@ -21,21 +21,21 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
               <div class="w-14 h-14 glass rounded-2xl flex items-center justify-center text-2xl">📧</div>
               <div>
                 <p class="text-sm opacity-60">Email Me</p>
-                <p class="text-lg font-bold">hello&#64;angularpro.dev</p>
+                <p class="text-lg font-bold">bilal.hamwia1&#64;gmail.com</p>
               </div>
             </div>
             <div class="flex items-center gap-6">
               <div class="w-14 h-14 glass rounded-2xl flex items-center justify-center text-2xl">📱</div>
               <div>
                 <p class="text-sm opacity-60">Call Me</p>
-                <p class="text-lg font-bold">+1 (555) 000-0000</p>
+                <p class="text-lg font-bold">+963 932329731</p>
               </div>
             </div>
             <div class="flex items-center gap-6">
               <div class="w-14 h-14 glass rounded-2xl flex items-center justify-center text-2xl">📍</div>
               <div>
                 <p class="text-sm opacity-60">Location</p>
-                <p class="text-lg font-bold">San Francisco, CA</p>
+                <p class="text-lg font-bold">Damascus, Syria</p>
               </div>
             </div>
           </div>
