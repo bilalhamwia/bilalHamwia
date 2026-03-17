@@ -47,12 +47,13 @@ import { gsap } from 'gsap';
           </div>
 
           <div class="flex flex-wrap gap-4 justify-center lg:justify-start reveal-btn-group">
-            <button class="btn-primary">View My Work</button>
-            <button class="px-8 py-3 rounded-full font-bold border-2 border-primary-start hover:bg-primary-start/10 transition-colors glass-btn">
+            <button class="px-8 py-3 rounded-full font-bold text-white transition-all duration-300 bg-primary-start hover:bg-primary-end hover:scale-105 shadow-lg relative z-20">
+              View My Work
+            </button>
+            <button class="px-8 py-3 rounded-full font-bold border-2 border-primary-start hover:bg-primary-start/10 transition-colors glass-btn relative z-20">
               Contact Me
             </button>
-          </div>
-        </div>
+          </div>        </div>
 
         <div #heroImage class="relative order-1 lg:order-2 max-w-[300px] md:max-w-[450px] mx-auto lg:max-w-none">
           <div class="glass p-3 md:p-4 rounded-3xl transform rotate-3 hover:rotate-0 transition-transform duration-500 hero-img-container">
@@ -109,12 +110,12 @@ export class HeroComponent implements AfterViewInit, OnDestroy {
     
     headlineContainer.innerHTML = ''; // Clear content
     
-    words.forEach((word, wordIndex) => {
+    words.forEach((word) => {
       const wordSpan = document.createElement('span');
       wordSpan.classList.add('inline-block', 'mr-3', 'whitespace-nowrap'); // Keep words together
       
-      if (word === 'Products') {
-        wordSpan.classList.add('gradient-text');
+      if (word.toLowerCase().includes('products')) {
+        wordSpan.classList.add('text-primary-start');
       }
 
       word.split('').forEach(char => {
@@ -135,17 +136,13 @@ export class HeroComponent implements AfterViewInit, OnDestroy {
     const socialIcons = this.heroContent.nativeElement.querySelectorAll('.social-icon');
 
     // 1. Text Reveal (Character by Character)
-    tl.fromTo(chars, 
-      { y: 50, opacity: 0, rotateX: -90 },
-      { 
-        y: 0, 
-        opacity: 1, 
-        rotateX: 0, 
-        stagger: 0.03, 
-        duration: 0.8, 
-        ease: 'back.out(1.7)' 
-      }
-    );
+    tl.to(chars, { 
+      y: 0, 
+      opacity: 1, 
+      stagger: 0.03, 
+      duration: 0.8, 
+      ease: 'back.out(1.7)' 
+    });
 
     // 2. Secondary Text Reveal
     tl.from('.reveal-text', {
@@ -156,7 +153,7 @@ export class HeroComponent implements AfterViewInit, OnDestroy {
       ease: 'power2.out'
     }, '-=0.5');
 
-    // 3. Social Icons "Pop" and Liquid Morph Setup
+    // 3. Social Icons Reveal
     tl.from(socialIcons, {
       scale: 0,
       opacity: 0,
@@ -165,41 +162,17 @@ export class HeroComponent implements AfterViewInit, OnDestroy {
       ease: 'elastic.out(1, 0.5)'
     }, '-=0.4');
 
-    // Setup Liquid Morph Hover for Icons
-    socialIcons.forEach((icon: any) => {
-      icon.addEventListener('mouseenter', () => {
-        gsap.to(icon, {
-          scale: 1.2,
-          rotation: 10,
-          borderRadius: "30% 70% 70% 30% / 30% 30% 70% 70%",
-          duration: 0.4,
-          ease: "elastic.out(1, 0.3)",
-          backgroundColor: 'rgba(99, 102, 241, 0.2)',
-          borderColor: 'rgba(99, 102, 241, 0.4)'
-        });
-      });
-
-      icon.addEventListener('mouseleave', () => {
-        gsap.to(icon, {
-          scale: 1,
-          rotation: 0,
-          borderRadius: "50%",
-          duration: 0.4,
-          ease: "power2.out",
-          backgroundColor: 'rgba(255, 255, 255, 0.1)',
-          borderColor: 'rgba(255, 255, 255, 0.2)'
-        });
-      });
-    });
-
     // 4. Buttons Reveal
-    tl.from('.reveal-btn-group button', {
-      y: 20,
-      opacity: 0,
-      stagger: 0.1,
-      duration: 0.6,
-      ease: 'power2.out'
-    }, '-=0.2');
+    tl.fromTo('.reveal-btn-group button', 
+      { y: 30, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        stagger: 0.1,
+        duration: 0.8,
+        ease: 'power3.out'
+      }, 
+    '-=0.4');
 
     // 5. Image & Decor Reveal
     const imageContainer = this.heroImage.nativeElement.querySelector('.hero-img-container');
