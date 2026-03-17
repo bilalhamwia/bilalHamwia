@@ -3,15 +3,19 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './layouts/header/header';
 import { FooterComponent } from './layouts/footer/footer';
+import { ParticleBackgroundComponent } from './shared/components/particle-background';
 import { gsap } from 'gsap';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, HeaderComponent, FooterComponent],
+  imports: [CommonModule, RouterOutlet, HeaderComponent, FooterComponent, ParticleBackgroundComponent],
   template: `
     <!-- Global Animated Background -->
     <div class="fixed inset-0 -z-50 overflow-hidden pointer-events-none bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
+      <!-- Particle System -->
+      <app-particle-background></app-particle-background>
+
       <!-- Animated Blobs -->
       <div #blob1 class="absolute w-[600px] h-[600px] rounded-full bg-primary-start/20 blur-[120px] -top-[10%] -left-[10%]"></div>
       <div #blob2 class="absolute w-[500px] h-[500px] rounded-full bg-secondary/15 blur-[100px] top-[40%] -right-[5%]"></div>

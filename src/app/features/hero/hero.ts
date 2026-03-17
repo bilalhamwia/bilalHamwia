@@ -8,9 +8,6 @@ import { gsap } from 'gsap';
   imports: [CommonModule],
   template: `
     <div class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-      <!-- Canvas Particle Background -->
-      <canvas #particleCanvas class="absolute inset-0 z-0 pointer-events-none"></canvas>
-
       <!-- Background Shapes (Fallback/Additional depth) -->
       <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-primary-start/10 rounded-full blur-3xl animate-pulse -z-10"></div>
       <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary-end/10 rounded-full blur-3xl animate-pulse delay-1000 -z-10"></div>
@@ -74,16 +71,9 @@ import { gsap } from 'gsap';
     </div>
   `
 })
-export class HeroComponent implements AfterViewInit, OnDestroy {
+export class HeroComponent implements AfterViewInit {
   @ViewChild('heroContent') heroContent!: ElementRef;
   @ViewChild('heroImage') heroImage!: ElementRef;
-  @ViewChild('particleCanvas') particleCanvas!: ElementRef<HTMLCanvasElement>;
-
-  private ctx!: CanvasRenderingContext2D;
-  private particles: Particle[] = [];
-  private animationFrameId: number = 0;
-  private mouse = { x: 0, y: 0 };
-  private canvasSize = { width: 0, height: 0 };
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
@@ -91,18 +81,12 @@ export class HeroComponent implements AfterViewInit, OnDestroy {
     if (isPlatformBrowser(this.platformId)) {
       this.initSplitText();
       this.initAnimations();
-      this.initCanvas();
-    }
-  }
-
-  ngOnDestroy() {
-    if (isPlatformBrowser(this.platformId)) {
-      cancelAnimationFrame(this.animationFrameId);
-      window.removeEventListener('resize', this.resizeCanvas);
     }
   }
 
   private initSplitText() {
+  // ... (rest of the method)
+
     // Manually split text to avoid dependency issues with premium plugins
     const headlineContainer = this.heroContent.nativeElement.querySelector('.headline-text');
     const text = "Architect and build digital Products";
@@ -227,112 +211,5 @@ export class HeroComponent implements AfterViewInit, OnDestroy {
     container.addEventListener('mouseleave', () => {
       gsap.to(element, { rotationY: 0, rotationX: 0, duration: 0.6, ease: 'power2.out' });
     });
-  }
-
-  // --- Canvas Particle System ---
-
-  private initCanvas() {
-    const canvas = this.particleCanvas.nativeElement;
-    this.ctx = canvas.getContext('2d')!;
-    
-    this.resizeCanvas();
-    window.addEventListener('resize', () => this.resizeCanvas());
-    
-    // Create particles
-    this.createParticles();
-    
-    // Track mouse
-    window.addEventListener('mousemove', (e) => {
-      this.mouse.x = e.clientX;
-      this.mouse.y = e.clientY;
-    });
-
-    this.animateCanvas();
-  }
-
-  private resizeCanvas() {
-    const canvas = this.particleCanvas.nativeElement;
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    this.canvasSize = { width: canvas.width, height: canvas.height };
-    this.createParticles(); // Recreate on resize for better distribution
-  }
-
-  private createParticles() {
-    this.particles = [];
-    const particleCount = window.innerWidth < 768 ? 30 : 60; // Fewer particles on mobile
-    
-    for (let i = 0; i < particleCount; i++) {
-      this.particles.push(new Particle(this.canvasSize.width, this.canvasSize.height));
-    }
-  }
-
-  private animateCanvas() {
-    this.ctx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
-    
-    this.particles.forEach(particle => {
-      particle.update(this.mouse);
-      particle.draw(this.ctx);
-    });
-
-    this.animationFrameId = requestAnimationFrame(() => this.animateCanvas());
-  }
-}
-
-class Particle {
-  x: number;
-  y: number;
-  size: number;
-  baseX: number;
-  baseY: number;
-  density: number;
-  color: string;
-
-  constructor(width: number, height: number) {
-    this.x = Math.random() * width;
-    this.y = Math.random() * height;
-    this.baseX = this.x;
-    this.baseY = this.y;
-    this.size = Math.random() * 3 + 1;
-    this.density = (Math.random() * 20) + 1;
-    this.color = `rgba(99, 102, 241, ${Math.random() * 0.5})`; // Primary color with opacity
-  }
-
-  draw(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    ctx.closePath();
-    ctx.fill();
-  }
-
-  update(mouse: { x: number, y: number }) {
-    const dx = mouse.x - this.x;
-    const dy = mouse.y - this.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const forceDirectionX = dx / distance;
-    const forceDirectionY = dy / distance;
-    
-    // Max distance to react to mouse
-    const maxDistance = 150;
-    const force = (maxDistance - distance) / maxDistance;
-    
-    // Move away from mouse if close
-    if (distance < maxDistance) {
-      const directionX = forceDirectionX * force * this.density;
-      const directionY = forceDirectionY * force * this.density;
-      this.x -= directionX;
-      this.y -= directionY;
-    } else {
-      // Return to base position
-      if (this.x !== this.baseX) {
-        const dx = this.x - this.baseX;
-        this.x -= dx / 10;
-      }
-      if (this.y !== this.baseY) {
-        const dy = this.y - this.baseY;
-        this.y -= dy / 10;
-      }
-    }
   }
 }
