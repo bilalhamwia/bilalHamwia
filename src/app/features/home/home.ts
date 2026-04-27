@@ -48,7 +48,7 @@ export class HomeComponent implements OnInit {
         'https://www.linkedin.com/in/bilal-hamwia0/',
         'https://github.com/bilalhamwia'
       ],
-      'description': 'Senior Software Engineer & UI/UX Specialist crafting high-performance, visually stunning web applications.'
+      'description': 'Senior Software Engineer and R&D Specialist crafting high-performance, visually stunning web applications.'
     });
   }
 }

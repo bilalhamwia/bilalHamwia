@@ -23,7 +23,7 @@ import { gsap } from 'gsap';
           </h1>
 
           <p class="text-lg md:text-xl opacity-80 mb-10 max-w-lg mx-auto lg:mx-0 reveal-text">
-            Software Engineer & UI/UX Specialist crafting high-performance, 
+            Software Engineer and R&D Specialist crafting high-performance, 
             visually stunning web applications with modern technologies.
           </p>
 
