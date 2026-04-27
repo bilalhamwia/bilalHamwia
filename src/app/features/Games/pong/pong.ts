@@ -57,6 +57,7 @@ export class PongComponent implements AfterViewInit, OnDestroy {
   overlaySubtitle = 'W / S — Left Paddle | ↑ / ↓ — Right Paddle';
   showOverlay = true;
   isEndGame = false;
+  isPortrait = false;
 
   p1!: Paddle;
   p2!: Paddle;
@@ -71,6 +72,7 @@ export class PongComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
       this.ctx = this.canvasRef.nativeElement.getContext('2d')!;
+      this.checkOrientation();
       this.resize();
       this.drawIdle();
       
@@ -96,59 +98,36 @@ export class PongComponent implements AfterViewInit, OnDestroy {
   @HostListener('window:resize')
   onResize() {
     if (isPlatformBrowser(this.platformId)) {
+      this.checkOrientation();
       this.resize();
       if (!this.gameRunning) this.drawIdle();
     }
   }
 
-  @HostListener('window:keydown', ['$event'])
-  onKeyDown(e: KeyboardEvent) {
-    this.keys[e.code] = true;
-    if (['ArrowUp', 'ArrowDown', 'KeyW', 'KeyS'].includes(e.code)) {
-      e.preventDefault();
-    }
+  @HostListener('window:orientationchange')
+  onOrientationChange() {
+    // Small delay to allow window dimensions to update
+    setTimeout(() => this.onResize(), 200);
   }
 
-  @HostListener('window:keyup', ['$event'])
-  onKeyUp(e: KeyboardEvent) {
-    this.keys[e.code] = false;
-  }
-
-  // Mobile Touch Support
-  onTouchMove(e: TouchEvent) {
-    if (!this.gameRunning) return;
-    e.preventDefault();
-    const rect = this.canvasRef.nativeElement.getBoundingClientRect();
-    for (let i = 0; i < e.touches.length; i++) {
-      const touch = e.touches[i];
-      const touchX = touch.clientX - rect.left;
-      const touchY = touch.clientY - rect.top;
-      const normY = touchY / rect.height * this.H;
-
-      if (touchX < rect.width / 2) {
-        // Left side touch controls P1
-        this.p1.y = normY;
-      } else if (!this.aiMode) {
-        // Right side touch controls P2 (if not AI)
-        this.p2.y = normY;
-      }
-    }
-    this.constrainPaddle(this.p1);
-    if (!this.aiMode) this.constrainPaddle(this.p2);
-  }
-
-  onTouchStart(e: TouchEvent) {
-    if (!this.gameRunning) return;
-    this.onTouchMove(e);
+  private checkOrientation() {
+    this.isPortrait = window.innerHeight > window.innerWidth;
   }
 
   private resize() {
-    const container = this.canvasRef.nativeElement.parentElement!;
     const maxW = Math.min(window.innerWidth * 0.96, 900);
-    const maxH = Math.min(window.innerHeight * 0.55, 500);
+    // In landscape or desktop, use less height. In portrait/small mobile, use more.
+    const hFactor = this.isPortrait ? 0.4 : 0.65;
+    const maxH = Math.min(window.innerHeight * hFactor, 500);
+    
     const ratio = 16 / 9;
     let w = maxW, h = maxW / ratio;
-    if (h > maxH) { h = maxH; w = h * ratio; }
+    
+    if (h > maxH) {
+      h = maxH;
+      w = h * ratio;
+    }
+
     this.W = Math.floor(w);
     this.H = Math.floor(h);
     this.canvasRef.nativeElement.width = this.W;
