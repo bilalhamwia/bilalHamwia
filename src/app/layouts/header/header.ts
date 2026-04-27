@@ -1,11 +1,12 @@
 import { Component, signal, HostListener, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 import { ThemeService } from '../../core/services/theme';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   template: `
     <header class="fixed top-0 left-0 w-full z-[100] transition-all duration-300"
             [class.bg-white/90]="!themeService.isDarkMode() && isScrolled()"
@@ -13,7 +14,7 @@ import { ThemeService } from '../../core/services/theme';
             [class.backdrop-blur-lg]="isScrolled()"
             [class.shadow-lg]="isScrolled()">
       <nav class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <div class="text-2xl font-bold gradient-text cursor-pointer" (click)="scrollTo('#home')">
+        <div class="text-2xl font-bold gradient-text cursor-pointer" (click)="navigateToHome()">
           Bilal Hamwia
         </div>
         
@@ -22,6 +23,7 @@ import { ThemeService } from '../../core/services/theme';
           <a (click)="scrollTo('#about')" class="hover:text-primary-start transition-colors cursor-pointer">About</a>
           <a (click)="scrollTo('#services')" class="hover:text-primary-start transition-colors cursor-pointer">Services</a>
           <a (click)="scrollTo('#portfolio')" class="hover:text-primary-start transition-colors cursor-pointer">Portfolio</a>
+          <a routerLink="/games" routerLinkActive="text-primary-start" class="hover:text-primary-start transition-colors cursor-pointer">Games</a>
           <a (click)="scrollTo('#contact')" class="hover:text-primary-start transition-colors cursor-pointer">Contact</a>
           
           <button (click)="themeService.toggleTheme()" 
@@ -51,6 +53,7 @@ import { ThemeService } from '../../core/services/theme';
         <a (click)="scrollTo('#about')" class="text-2xl font-bold border-b border-gray-100 dark:border-gray-800 pb-4">About</a>
         <a (click)="scrollTo('#services')" class="text-2xl font-bold border-b border-gray-100 dark:border-gray-800 pb-4">Services</a>
         <a (click)="scrollTo('#portfolio')" class="text-2xl font-bold border-b border-gray-100 dark:border-gray-800 pb-4">Portfolio</a>
+        <a routerLink="/games" (click)="toggleMobileMenu()" class="text-2xl font-bold border-b border-gray-100 dark:border-gray-800 pb-4">Games</a>
         <a (click)="scrollTo('#contact')" class="text-2xl font-bold border-b border-gray-100 dark:border-gray-800 pb-4">Contact</a>
       </div>
     </header>
@@ -62,6 +65,7 @@ export class HeaderComponent {
 
   constructor(
     public themeService: ThemeService,
+    private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -76,20 +80,38 @@ export class HeaderComponent {
     this.isMobileMenuOpen.update(v => !v);
   }
 
+  navigateToHome() {
+    if (this.router.url !== '/') {
+      this.router.navigate(['/']);
+    } else {
+      this.scrollTo('#home');
+    }
+  }
+
   scrollTo(selector: string) {
     if (isPlatformBrowser(this.platformId)) {
-      const element = document.querySelector(selector);
-      if (element) {
-        const headerOffset = 80;
-        const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth'
+      if (this.router.url !== '/') {
+        this.router.navigate(['/']).then(() => {
+          setTimeout(() => this.performScroll(selector), 100);
         });
+      } else {
+        this.performScroll(selector);
       }
       this.isMobileMenuOpen.set(false);
+    }
+  }
+
+  private performScroll(selector: string) {
+    const element = document.querySelector(selector);
+    if (element) {
+      const headerOffset = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
     }
   }
 }

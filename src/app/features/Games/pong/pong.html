@@ -1,0 +1,57 @@
+<div class="pong-wrapper">
+  <div class="header-actions">
+    <button class="exit-btn" (click)="exitGame()">← Back to Games</button>
+    <div id="title">PONG</div>
+  </div>
+
+  <div id="scoreboard">
+    <div class="player-info">
+      <div class="player-label">PLAYER 1</div>
+      <div class="score" id="score1">{{scores[0]}}</div>
+    </div>
+    <div class="divider">:</div>
+    <div class="player-info">
+      <div class="player-label" id="p2-label">{{p2Label}}</div>
+      <div class="score" id="score2">{{scores[1]}}</div>
+    </div>
+  </div>
+
+  <div id="canvas-frame" (touchstart)="onTouchStart($event)" (touchmove)="onTouchMove($event)">
+    <canvas #pongCanvas id="pong"></canvas>
+
+    <div id="overlay" [class.hidden]="!showOverlay">
+      <div id="overlay-title">{{overlayTitle}}</div>
+      <div id="overlay-subtitle" [innerHTML]="overlaySubtitle"></div>
+      
+      <div id="btn-row" *ngIf="!isEndGame">
+        <button class="btn" (click)="initGame(false)">2-PLAYER MODE</button>
+        <button class="btn btn-ai" (click)="initGame(true)">VS AI MODE</button>
+      </div>
+
+      <div id="btn-row" *ngIf="isEndGame">
+        <button class="btn" (click)="initGame(aiMode)">REMATCH</button>
+        <button class="btn btn-ai" (click)="showMainMenu()">MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="speed-bar-wrap">
+    <span>SPEED</span>
+    <div id="speed-bar"><div id="speed-fill" [style.width]="getSpeedPct()"></div></div>
+  </div>
+
+  <div id="controls" class="hidden md:flex">
+    <div class="ctrl-group">
+      <span>P1</span>
+      <kbd>W</kbd><kbd>S</kbd>
+    </div>
+    <div class="ctrl-group">
+      <span>P2</span>
+      <kbd>↑</kbd><kbd>↓</kbd>
+    </div>
+  </div>
+
+  <div class="mobile-hint md:hidden">
+    Touch sides of screen to move paddles
+  </div>
+</div>
