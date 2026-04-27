@@ -35,10 +35,18 @@ body.dark {
 
 .glass {
   @apply bg-white/10 backdrop-blur-md border border-white/20;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .dark .glass {
   @apply bg-black/20 backdrop-blur-md border border-white/10;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .btn-primary {

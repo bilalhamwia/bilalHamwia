@@ -7,6 +7,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
   selector: 'app-services',
   standalone: true,
   imports: [CommonModule],
+  styleUrl: './services.scss',
   template: `
     <div class="py-24 bg-gray-50/50 dark:bg-black/20" #servicesContainer>
       <div class="max-w-7xl mx-auto px-6">
@@ -20,7 +21,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
         <div class="grid md:grid-cols-3 gap-8 services-grid">
           <div *ngFor="let service of services" 
-               class="glass p-10 rounded-[2.5rem] group hover:bg-primary-start transition-all duration-500 hover:-translate-y-2 cursor-default service-card">
+               class="glass p-10 rounded-[2.5rem] group hover:bg-primary-start cursor-default service-card">
             <div class="w-16 h-16 glass rounded-2xl flex items-center justify-center text-4xl mb-8 group-hover:scale-110 transition-transform service-icon">
               {{ service.icon }}
             </div>
@@ -75,7 +76,11 @@ export class ServicesComponent implements AfterViewInit {
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
       gsap.registerPlugin(ScrollTrigger);
-      this.initAnimations();
+      // Small timeout to ensure layout is settled
+      setTimeout(() => {
+        this.initAnimations();
+        ScrollTrigger.refresh();
+      }, 100);
     }
   }
 
@@ -98,11 +103,13 @@ export class ServicesComponent implements AfterViewInit {
         y: 60,
         opacity: 0,
         stagger: 0.15,
-        duration: 1,
+        duration: 1.2,
         ease: 'power4.out',
-        overwrite: true
+        overwrite: true,
+        clearProps: 'all'
       }),
-      start: 'top 85%'
+      start: 'top 85%',
+      once: true
     });
   }
 }

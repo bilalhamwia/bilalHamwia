@@ -31,7 +31,21 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
               <span>Scalable Database Design (MySQL)</span>
             </div>
           </div>
-          <button class="btn-primary about-btn">Download CV</button>
+
+          <div class="mb-10 education-section">
+            <h3 class="text-2xl font-bold mb-6 gradient-text inline-block">Education</h3>
+            <div class="glass p-6 rounded-2xl border-l-4 border-primary-start hover:scale-[1.02] transition-transform duration-300">
+              <h4 class="text-xl font-bold">Bachelor Degree in Information Technology</h4>
+              <p class="text-primary-start font-semibold">Arab International University</p>
+              <div class="flex justify-between items-center mt-2 opacity-70 text-sm">
+                <span>📍 Damascus, Syria</span>
+                <span>🎓 2015 – 2022</span>
+              </div>
+            </div>
+          </div>
+
+
+          <a href="assets/cv.pdf" download class="btn-primary about-btn inline-block">Download CV</a>
         </div>
 
         <div class="space-y-8" #skillsSection>
@@ -45,7 +59,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
             <div class="h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
               <div class="h-full bg-gradient-to-r from-primary-start to-primary-end skill-bar"
                    [attr.data-level]="skill.level"
-                   style="width: 0%"></div>
+                   style="width: 0%">
+              </div>
             </div>
           </div>
 
@@ -113,10 +128,10 @@ export class AboutComponent implements AfterViewInit, OnDestroy {
       }
     });
 
-    leftTl.from('.about-title', { y: 30, opacity: 0, duration: 0.8 })
-          .from('.about-p', { y: 20, opacity: 0, duration: 0.8 }, '-=0.4')
-          .from('.about-list > div', { x: -20, opacity: 0, stagger: 0.15, duration: 0.6 }, '-=0.4')
-          .from('.about-btn', { scale: 0.8, opacity: 0, duration: 0.5 }, '-=0.2');
+    leftTl.from('.about-title', { y: 30, opacity: 0, duration: 0.8, immediateRender: false })
+          .from('.about-p', { y: 20, opacity: 0, duration: 0.8, immediateRender: false }, '-=0.4')
+          .from('.about-list > div', { x: -20, opacity: 0, stagger: 0.15, duration: 0.6, immediateRender: false }, '-=0.4')
+          .from('.about-btn', { scale: 0.8, opacity: 0, duration: 0.5, clearProps: 'all', immediateRender: false }, '-=0.2');
 
     // Right side (Skills) reveal
     gsap.from('.skills-title', {

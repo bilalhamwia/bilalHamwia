@@ -4,7 +4,6 @@ import { AboutComponent } from '../about/about';
 import { PortfolioComponent } from '../portfolio/portfolio';
 import { ServicesComponent } from '../services/services';
 import { TestimonialsComponent } from '../testimonials/testimonials';
-import { BlogComponent } from '../blog/blog';
 import { ContactComponent } from '../contact/contact';
 import { MetaService } from '../../core/services/meta';
 
@@ -17,7 +16,6 @@ import { MetaService } from '../../core/services/meta';
     PortfolioComponent,
     ServicesComponent,
     TestimonialsComponent,
-    BlogComponent,
     ContactComponent
   ],
   template: `
@@ -26,7 +24,6 @@ import { MetaService } from '../../core/services/meta';
     <section id="services"><app-services></app-services></section>
     <section id="portfolio"><app-portfolio></app-portfolio></section>
     <section id="testimonials"><app-testimonials></app-testimonials></section>
-    <section id="blog"><app-blog></app-blog></section>
     <section id="contact"><app-contact></app-contact></section>
   `
 })

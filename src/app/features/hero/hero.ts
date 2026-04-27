@@ -18,7 +18,7 @@ import { gsap } from 'gsap';
             <span class="inline-block reveal-text">Hello, I'm</span>
           </h2>
           
-          <h1 class="text-4xl md:text-6xl lg:text-8xl font-black mb-6 leading-tight headline-text">
+          <h1 class="text-4xl md:text-6xl lg:text-8xl font-black mb-6 leading-tight headline-text text-slate-900 dark:text-white">
             <!-- Text content injected via TS for splitting -->
           </h1>
 
@@ -29,25 +29,25 @@ import { gsap } from 'gsap';
 
           <!-- Social Icons with Liquid Morph -->
           <div class="flex gap-6 justify-center lg:justify-start mb-10 social-icons">
-            <a href="#" class="w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-2xl hover:text-primary-start transition-colors social-icon" aria-label="GitHub">
+            <a href="https://github.com/bilalhamwia" class="w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-2xl hover:text-primary-start transition-colors social-icon" aria-label="GitHub">
               <i class="fab fa-github">GH</i>
             </a>
-            <a href="#" class="w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-2xl hover:text-primary-start transition-colors social-icon" aria-label="LinkedIn">
+            <a href="https://www.linkedin.com/in/bilal-hamwia0/" class="w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-2xl hover:text-primary-start transition-colors social-icon" aria-label="LinkedIn">
               <i class="fab fa-linkedin">LI</i>
             </a>
-            <a href="#" class="w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-2xl hover:text-primary-start transition-colors social-icon" aria-label="Twitter">
-              <i class="fab fa-twitter">TW</i>
+            <a href="https://www.facebook.com/BilalHamwia/" class="w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-2xl hover:text-primary-start transition-colors social-icon" aria-label="Twitter">
+              <i class="fab fa-twitter">FB</i>
             </a>
-             <a href="#" class="w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-2xl hover:text-primary-start transition-colors social-icon" aria-label="Email">
-              <i class="fas fa-envelope">@</i>
+             <a href="https://www.instagram.com/bilal_hamwia/" class="w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-2xl hover:text-primary-start transition-colors social-icon" aria-label="Email">
+              <i class="fas fa-envelope">IG</i>
             </a>
           </div>
 
           <div class="flex flex-wrap gap-4 justify-center lg:justify-start reveal-btn-group">
-            <button class="px-8 py-3 rounded-full font-bold text-white transition-all duration-300 bg-primary-start hover:bg-primary-end hover:scale-105 shadow-lg relative z-20">
+            <button (click)="scrollTo('#portfolio')" class="px-8 py-3 rounded-full font-bold text-white transition-all duration-300 bg-primary-start hover:bg-primary-end hover:scale-105 shadow-lg relative z-20">
               View My Work
             </button>
-            <button class="px-8 py-3 rounded-full font-bold border-2 border-primary-start hover:bg-primary-start/10 transition-colors glass-btn relative z-20">
+            <button (click)="scrollTo('#contact')" class="px-8 py-3 rounded-full font-bold border-2 border-primary-start hover:bg-primary-start/10 transition-colors glass-btn relative z-20">
               Contact Me
             </button>
           </div>        </div>
@@ -80,23 +80,25 @@ export class HeroComponent implements AfterViewInit {
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
       this.initSplitText();
-      this.initAnimations();
+      // Use a small delay to ensure DOM is updated and GSAP can see the .char elements
+      setTimeout(() => {
+        this.initAnimations();
+      }, 50);
     }
   }
 
   private initSplitText() {
-  // ... (rest of the method)
-
-    // Manually split text to avoid dependency issues with premium plugins
     const headlineContainer = this.heroContent.nativeElement.querySelector('.headline-text');
+    if (!headlineContainer) return;
+
     const text = "Architect and build digital Products";
     const words = text.split(' ');
     
-    headlineContainer.innerHTML = ''; // Clear content
+    headlineContainer.innerHTML = ''; 
     
     words.forEach((word) => {
       const wordSpan = document.createElement('span');
-      wordSpan.classList.add('inline-block', 'mr-3', 'whitespace-nowrap'); // Keep words together
+      wordSpan.classList.add('inline-block', 'mr-3', 'whitespace-nowrap');
       
       if (word.toLowerCase().includes('products')) {
         wordSpan.classList.add('text-primary-start');
@@ -106,7 +108,9 @@ export class HeroComponent implements AfterViewInit {
         const charSpan = document.createElement('span');
         charSpan.textContent = char;
         charSpan.classList.add('char', 'inline-block');
-        charSpan.style.opacity = '0'; // Hide initially
+        // Set initial state via style to avoid flash
+        charSpan.style.opacity = '0';
+        charSpan.style.transform = 'translateY(30px)';
         wordSpan.appendChild(charSpan);
       });
 
@@ -119,14 +123,21 @@ export class HeroComponent implements AfterViewInit {
     const chars = this.heroContent.nativeElement.querySelectorAll('.char');
     const socialIcons = this.heroContent.nativeElement.querySelectorAll('.social-icon');
 
-    // 1. Text Reveal (Character by Character)
-    tl.to(chars, { 
-      y: 0, 
-      opacity: 1, 
-      stagger: 0.03, 
-      duration: 0.8, 
-      ease: 'back.out(1.7)' 
-    });
+    if (chars.length > 0) {
+      // 1. Text Reveal (Character by Character)
+      tl.fromTo(chars, 
+        { y: 30, opacity: 0 },
+        { 
+          y: 0, 
+          opacity: 1, 
+          stagger: 0.03, 
+          duration: 0.8, 
+          ease: 'back.out(1.7)',
+          immediateRender: false,
+          clearProps: 'all'
+        }
+      );
+    }
 
     // 2. Secondary Text Reveal
     tl.from('.reveal-text', {
@@ -211,5 +222,21 @@ export class HeroComponent implements AfterViewInit {
     container.addEventListener('mouseleave', () => {
       gsap.to(element, { rotationY: 0, rotationX: 0, duration: 0.6, ease: 'power2.out' });
     });
+  }
+
+  scrollTo(selector: string) {
+    if (isPlatformBrowser(this.platformId)) {
+      const element = document.querySelector(selector);
+      if (element) {
+        const headerOffset = 80;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    }
   }
 }

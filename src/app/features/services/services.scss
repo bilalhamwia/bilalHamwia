@@ -1,0 +1,34 @@
+.service-card {
+  /* Ensure a stable rendering context for GSAP animations */
+  perspective: 1000px;
+  will-change: transform, opacity;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Force GPU for all children to prevent blurriness */
+  & > * {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  &:hover {
+    transform: translateY(-8px) translateZ(0) !important;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  }
+}
+
+/* Specific fix for backdrop-filter causing blurriness in Chrome */
+:host ::ng-deep .glass {
+  /* This helps keep things sharp during transforms */
+  isolation: isolate;
+  transition: all 0.5s ease;
+}
+
+/* Ensure icons and text stay sharp */
+.service-icon, .service-title, .service-desc {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.service-icon {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
