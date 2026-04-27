@@ -114,6 +114,34 @@ export class PongComponent implements AfterViewInit, OnDestroy {
     this.isPortrait = window.innerHeight > window.innerWidth;
   }
 
+  // Mobile Touch Support
+  onTouchMove(e: TouchEvent) {
+    if (!this.gameRunning) return;
+    e.preventDefault();
+    const rect = this.canvasRef.nativeElement.getBoundingClientRect();
+    for (let i = 0; i < e.touches.length; i++) {
+      const touch = e.touches[i];
+      const touchX = touch.clientX - rect.left;
+      const touchY = touch.clientY - rect.top;
+      const normY = touchY / rect.height * this.H;
+
+      if (touchX < rect.width / 2) {
+        // Left side touch controls P1
+        this.p1.y = normY;
+      } else if (!this.aiMode) {
+        // Right side touch controls P2 (if not AI)
+        this.p2.y = normY;
+      }
+    }
+    this.constrainPaddle(this.p1);
+    if (!this.aiMode) this.constrainPaddle(this.p2);
+  }
+
+  onTouchStart(e: TouchEvent) {
+    if (!this.gameRunning) return;
+    this.onTouchMove(e);
+  }
+
   private resize() {
     const maxW = Math.min(window.innerWidth * 0.96, 900);
     // In landscape or desktop, use less height. In portrait/small mobile, use more.
