@@ -2,6 +2,8 @@ import { Component, signal, AfterViewInit, Inject, PLATFORM_ID, effect } from '@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { animate } from 'framer-motion/dom';
+import { ScrollRevealDirective } from '../../shared/directives/scroll-reveal.directive';
 
 interface Project {
   id: number;
@@ -18,52 +20,56 @@ interface Project {
 @Component({
   selector: 'app-portfolio',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ScrollRevealDirective],
   template: `
-    <div class="py-24 max-w-7xl mx-auto px-6">
-      <div class="text-center mb-16">
-        <h2 class="text-4xl font-bold mb-4 gradient-text inline-block">My Portfolio</h2>
-        <p class="opacity-70 max-w-xl mx-auto text-lg">
+    <div class="py-24 md:py-32 max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16" appScrollReveal revealType="springUp">
+        <h2 class="text-4xl md:text-5xl font-bold mb-4 gradient-text inline-block">My Portfolio</h2>
+        <p class="opacity-70 max-w-xl mx-auto text-lg leading-relaxed">
           A selection of recent projects showcasing my expertise in 
           building modern, scalable web and desktop applications.
         </p>
       </div>
 
       <!-- Filters -->
-      <div class="flex flex-wrap justify-center gap-4 mb-12">
+      <div class="flex flex-wrap justify-center gap-3 mb-14" appScrollReveal revealType="springUp" [revealStagger]="0.06" revealTarget=".filter-btn">
         <button *ngFor="let filter of filters; let i = index" 
                 (click)="filterBy(filter)"
-                class="px-6 py-2 rounded-full font-semibold transition-all duration-300 filter-btn"
-                [class.bg-primary-start]="activeFilter() === filter"
+                class="px-6 py-2.5 rounded-full font-semibold transition-all duration-300 filter-btn"
+                [class.bg-gradient-to-r]="activeFilter() === filter"
+                [class.from-primary-start]="activeFilter() === filter"
+                [class.to-primary-end]="activeFilter() === filter"
                 [class.text-white]="activeFilter() === filter"
-                [class.glass]="activeFilter() !== filter">
+                [class.glass]="activeFilter() !== filter"
+                [class.hover:bg-primary-start/10]="activeFilter() !== filter">
           {{ filter }}
         </button>
       </div>
 
       <!-- Grid -->
-      <div #projectGrid class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div #projectGrid class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         <div *ngFor="let project of filteredProjects(); let i = index" 
-             class="glass rounded-3xl overflow-hidden group hover:scale-[1.03] hover:shadow-2xl transition-all duration-500 project-card"
+             class="glass rounded-3xl overflow-hidden group hover:shadow-2xl hover:shadow-primary-start/10 transition-all duration-500 project-card will-change-transform"
              [attr.data-index]="i">
-          <div class="relative aspect-video overflow-hidden">
+          <div class="relative aspect-video overflow-hidden bg-gray-100 dark:bg-gray-800">
             <img *ngIf="project.image" [src]="project.image" [alt]="project.title" 
-                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-            <div *ngIf="!project.image" class="w-full h-full bg-gradient-to-br from-primary-start/40 to-primary-end/40 flex items-center justify-center text-4xl">
+                 class="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 project-img"
+                 style="will-change: transform;">
+            <div *ngIf="!project.image" class="w-full h-full bg-gradient-to-br from-primary-start/20 to-primary-end/20 flex items-center justify-center text-5xl">
               🖼️
             </div>
-            <div class="absolute inset-0 bg-gradient-to-t from-primary-start/90 via-primary-start/60 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end justify-center p-6">
-              <div class="flex gap-3 flex-wrap justify-center w-full">
+            <div class="absolute inset-0 bg-gradient-to-t from-primary-start/90 via-primary-start/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end justify-center p-6">
+              <div class="flex gap-3 flex-wrap justify-center w-full translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                 <a *ngIf="project.githubUrl" [href]="project.githubUrl" target="_blank" 
-                   class="px-4 py-2 bg-white text-primary-start rounded-full font-bold hover:bg-opacity-90 transition-all text-sm transform hover:scale-105">
+                   class="px-4 py-2 bg-white text-primary-start rounded-full font-bold hover:bg-opacity-90 transition-all text-sm hover:scale-105">
                   {{ project.githubBackendUrl ? 'Frontend' : 'GitHub' }}
                 </a>
                 <a *ngIf="project.githubBackendUrl" [href]="project.githubBackendUrl" target="_blank" 
-                   class="px-4 py-2 bg-white text-primary-start rounded-full font-bold hover:bg-opacity-90 transition-all text-sm transform hover:scale-105">
+                   class="px-4 py-2 bg-white text-primary-start rounded-full font-bold hover:bg-opacity-90 transition-all text-sm hover:scale-105">
                   Backend
                 </a>
                 <a *ngIf="project.demoUrl" [href]="project.demoUrl" target="_blank" 
-                   class="px-4 py-2 border-2 border-white text-white rounded-full font-bold hover:bg-white hover:text-primary-start transition-all text-sm transform hover:scale-105">
+                   class="px-4 py-2 border-2 border-white text-white rounded-full font-bold hover:bg-white hover:text-primary-start transition-all text-sm hover:scale-105">
                   Demo
                 </a>
               </div>
@@ -73,10 +79,10 @@ interface Project {
             <div class="flex justify-between items-start mb-2">
               <span class="text-xs font-bold uppercase tracking-wider text-primary-start">{{ project.category }}</span>
             </div>
-            <h3 class="text-xl font-bold mb-3 group-hover:text-primary-start transition-colors">{{ project.title }}</h3>
-            <p class="opacity-70 text-sm mb-4 line-clamp-3">{{ project.description }}</p>
+            <h3 class="text-xl font-bold mb-3 group-hover:text-primary-start transition-colors duration-300">{{ project.title }}</h3>
+            <p class="opacity-70 text-sm mb-4 line-clamp-3 leading-relaxed">{{ project.description }}</p>
             <div class="flex flex-wrap gap-2">
-              <span *ngFor="let tag of project.tags" class="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-xs tag-pill">
+              <span *ngFor="let tag of project.tags" class="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-full text-xs font-medium tag-pill">
                 {{ tag }}
               </span>
             </div>
@@ -191,7 +197,7 @@ export class PortfolioComponent implements AfterViewInit {
     if (this.isBrowser) {
       setTimeout(() => {
         this.initAnimations();
-      }, 100);
+      }, 150);
     }
   }
 
@@ -210,8 +216,8 @@ export class PortfolioComponent implements AfterViewInit {
         y: 0,
         opacity: 1,
         scale: 1,
-        stagger: 0.08,
-        duration: 0.5,
+        stagger: 0.06,
+        duration: 0.6,
         ease: 'power3.out',
       }
     );
@@ -225,7 +231,7 @@ export class PortfolioComponent implements AfterViewInit {
       },
       y: 20,
       opacity: 0,
-      stagger: 0.08,
+      stagger: 0.06,
       duration: 0.5,
       ease: 'power3.out',
     });
@@ -234,13 +240,13 @@ export class PortfolioComponent implements AfterViewInit {
 
     const cards = document.querySelectorAll('.project-card');
     cards.forEach((card) => {
-      const img = card.querySelector('img');
+      const img = card.querySelector('.project-img');
       if (img) {
         card.addEventListener('mouseenter', () => {
-          gsap.to(img, { scale: 1.1, duration: 0.6, ease: 'power2.out' });
+          gsap.to(img, { scale: 1.1, duration: 0.7, ease: 'power2.out' });
         });
         card.addEventListener('mouseleave', () => {
-          gsap.to(img, { scale: 1, duration: 0.6, ease: 'power2.out' });
+          gsap.to(img, { scale: 1, duration: 0.7, ease: 'power2.out' });
         });
       }
     });

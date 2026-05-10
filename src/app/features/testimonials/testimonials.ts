@@ -1,6 +1,9 @@
 import { Component, AfterViewInit, Inject, PLATFORM_ID, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { animate, inView } from 'framer-motion/dom';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollRevealDirective } from '../../shared/directives/scroll-reveal.directive';
 
 interface Experience {
   company: string;
@@ -17,7 +20,7 @@ interface Experience {
 @Component({
   selector: 'app-testimonials',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ScrollRevealDirective],
   template: `
     <section #section
              class="relative py-24 md:py-32 overflow-hidden bg-white dark:bg-black/20">
@@ -25,7 +28,7 @@ interface Experience {
       <div class="max-w-7xl mx-auto px-6">
 
         <!-- ========== HEADER ========== -->
-        <div class="mb-24 md:mb-36">
+        <div class="mb-24 md:mb-36" appScrollReveal revealType="springUp">
           <div class="flex items-center gap-4 mb-5">
             <span class="h-px w-12 md:w-20 bg-current opacity-20"></span>
             <span class="text-[10px] md:text-xs font-bold tracking-[0.25em] uppercase opacity-40">The journey</span>
@@ -57,7 +60,7 @@ interface Experience {
                   class="text-[clamp(2.5rem,9vw,7rem)] md:text-[clamp(3.5rem,5vw,7.5rem)] 
                          font-black leading-[0.88] tracking-tight mb-1">
                 <span class="block">Software</span>
-                <span class="block gradient-text">Developer</span>
+                <span class="block gradient-text">Engineer</span>
               </h3>
 
               <div data-anim="company-line"
@@ -297,61 +300,54 @@ export class TestimonialsComponent implements AfterViewInit, OnDestroy {
 
     const stopInView = inView(el, () => {
 
-      // header
-      const hdLine = el.querySelector('[data-anim="header-line"]');
-      if (hdLine) animate(hdLine, { x: [-25, 0], opacity: [0, 1] }, { duration: 0.5, ease: 'easeOut' });
-
-      const hdTitle = el.querySelector('[data-anim="header-title"]');
-      if (hdTitle) animate(hdTitle, { y: [35, 0], opacity: [0, 1] }, { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.12 });
-
       // ch1
       const c1 = '[data-chapter="1"]';
 
       const c1p = el.querySelectorAll(`${c1} [data-anim="period"]`);
-      if (c1p.length) animate(c1p, { y: [8, 0], opacity: [0, 1] }, { duration: 0.35, delay: 0.25 });
+      if (c1p.length) animate(c1p, { y: [8, 0], opacity: [0, 1] }, { duration: 0.35, delay: 0.15 });
 
       const c1r = el.querySelectorAll(`${c1} [data-anim="role-title"]`);
-      if (c1r.length) animate(c1r, { y: [45, 0], scale: [0.96, 1], opacity: [0, 1] }, { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.3 });
+      if (c1r.length) animate(c1r, { y: [45, 0], scale: [0.96, 1], opacity: [0, 1] }, { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.2 });
 
       const c1c = el.querySelectorAll(`${c1} [data-anim="company-line"]`);
-      if (c1c.length) animate(c1c, { x: [-25, 0], opacity: [0, 1] }, { duration: 0.45, delay: 0.45, ease: 'easeOut' });
+      if (c1c.length) animate(c1c, { x: [-25, 0], opacity: [0, 1] }, { duration: 0.45, delay: 0.35, ease: 'easeOut' });
 
       const c1s = el.querySelectorAll(`${c1} [data-anim="stat-block"]`);
-      if (c1s.length) animate(c1s, { scale: [0.85, 1], opacity: [0, 1] }, { duration: 0.55, ease: [0.34, 1.56, 0.64, 1], delay: 0.55 });
+      if (c1s.length) animate(c1s, { scale: [0.85, 1], opacity: [0, 1] }, { duration: 0.55, ease: [0.34, 1.56, 0.64, 1], delay: 0.45 });
 
       const c1resp = el.querySelectorAll(`${c1} [data-anim="resp-group"] .resp-item`);
-      if (c1resp.length) animate(c1resp, { x: [12, 0], opacity: [0, 1] }, { duration: 0.35, delay: 0.65, ease: 'easeOut' });
+      if (c1resp.length) animate(c1resp, { x: [12, 0], opacity: [0, 1] }, { duration: 0.35, delay: 0.55, ease: 'easeOut' });
 
       const c1tech = el.querySelectorAll(`${c1} [data-anim="tech-group"] span`);
-      if (c1tech.length) animate(c1tech, { y: [10, 0], opacity: [0, 1] }, { duration: 0.3, delay: 0.8, ease: 'easeOut' });
+      if (c1tech.length) animate(c1tech, { y: [10, 0], opacity: [0, 1] }, { duration: 0.3, delay: 0.65, ease: 'easeOut' });
 
       // divider
       const dv = el.querySelectorAll('[data-anim="divider"]');
-      if (dv.length) animate(dv, { opacity: [0, 1] }, { duration: 0.5, delay: 0.9 });
+      if (dv.length) animate(dv, { opacity: [0, 1] }, { duration: 0.5, delay: 0.75 });
 
       // ch2
       const c2 = '[data-chapter="2"]';
 
       const c2s = el.querySelectorAll(`${c2} [data-anim="stat-block"]`);
-      if (c2s.length) animate(c2s, { scale: [0.85, 1], opacity: [0, 1] }, { duration: 0.55, ease: [0.34, 1.56, 0.64, 1], delay: 1.1 });
+      if (c2s.length) animate(c2s, { scale: [0.85, 1], opacity: [0, 1] }, { duration: 0.55, ease: [0.34, 1.56, 0.64, 1], delay: 0.9 });
 
       const c2resp = el.querySelectorAll(`${c2} [data-anim="resp-group"] .resp-item`);
-      if (c2resp.length) animate(c2resp, { x: [-12, 0], opacity: [0, 1] }, { duration: 0.35, delay: 1.2, ease: 'easeOut' });
+      if (c2resp.length) animate(c2resp, { x: [-12, 0], opacity: [0, 1] }, { duration: 0.35, delay: 1.0, ease: 'easeOut' });
 
       const c2tech = el.querySelectorAll(`${c2} [data-anim="tech-group"] span`);
-      if (c2tech.length) animate(c2tech, { y: [10, 0], opacity: [0, 1] }, { duration: 0.3, delay: 1.35, ease: 'easeOut' });
+      if (c2tech.length) animate(c2tech, { y: [10, 0], opacity: [0, 1] }, { duration: 0.3, delay: 1.1, ease: 'easeOut' });
 
       const c2p = el.querySelectorAll(`${c2} [data-anim="period"]`);
-      if (c2p.length) animate(c2p, { y: [8, 0], opacity: [0, 1] }, { duration: 0.35, delay: 1.0 });
+      if (c2p.length) animate(c2p, { y: [8, 0], opacity: [0, 1] }, { duration: 0.35, delay: 0.85 });
 
       const c2r = el.querySelectorAll(`${c2} [data-anim="role-title"]`);
-      if (c2r.length) animate(c2r, { y: [45, 0], scale: [0.96, 1], opacity: [0, 1] }, { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 1.05 });
+      if (c2r.length) animate(c2r, { y: [45, 0], scale: [0.96, 1], opacity: [0, 1] }, { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.9 });
 
       const c2c = el.querySelectorAll(`${c2} [data-anim="company-line"]`);
-      if (c2c.length) animate(c2c, { x: [25, 0], opacity: [0, 1] }, { duration: 0.45, delay: 1.15, ease: 'easeOut' });
+      if (c2c.length) animate(c2c, { x: [25, 0], opacity: [0, 1] }, { duration: 0.45, delay: 1.0, ease: 'easeOut' });
 
       return () => {};
-    }, { amount: 0.1 });
+    }, { amount: 0.08 });
 
     this.cleanupFns.push(stopInView);
   }

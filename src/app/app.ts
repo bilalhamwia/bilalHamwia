@@ -5,6 +5,7 @@ import { HeaderComponent } from './layouts/header/header';
 import { FooterComponent } from './layouts/footer/footer';
 import { ParticleBackgroundComponent } from './shared/components/particle-background';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 @Component({
   selector: 'app-root',
@@ -13,22 +14,22 @@ import { gsap } from 'gsap';
   template: `
     <!-- Custom Cursor Follower -->
     <div #cursorFollower
-         class="fixed w-6 h-6 rounded-full bg-primary-start/20 border border-primary-start/40 pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2 hidden md:block"
-         style="left: -100px; top: -100px; transition: width 0.3s, height 0.3s;">
+         class="fixed w-5 h-5 rounded-full bg-primary-start/20 border border-primary-start/40 pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2 hidden md:block mix-blend-difference"
+         style="left: -100px; top: -100px;">
     </div>
 
     <!-- Global Animated Background -->
-    <div class="fixed inset-0 -z-50 overflow-hidden pointer-events-none bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
+    <div class="fixed inset-0 -z-50 overflow-hidden pointer-events-none bg-slate-50 dark:bg-slate-950 transition-colors duration-700">
       <!-- Particle System -->
       <app-particle-background></app-particle-background>
 
       <!-- Animated Blobs with organic paths -->
-      <div #blob1 class="absolute w-[600px] h-[600px] rounded-full bg-primary-start/20 blur-[120px] -top-[10%] -left-[10%]"></div>
-      <div #blob2 class="absolute w-[500px] h-[500px] rounded-full bg-secondary/15 blur-[100px] top-[40%] -right-[5%]"></div>
-      <div #blob3 class="absolute w-[400px] h-[400px] rounded-full bg-primary-end/10 blur-[80px] -bottom-[10%] left-[20%]"></div>
+      <div #blob1 class="absolute w-[600px] h-[600px] rounded-full bg-primary-start/15 blur-[120px] -top-[10%] -left-[10%]"></div>
+      <div #blob2 class="absolute w-[500px] h-[500px] rounded-full bg-secondary/12 blur-[100px] top-[40%] -right-[5%]"></div>
+      <div #blob3 class="absolute w-[400px] h-[400px] rounded-full bg-primary-end/8 blur-[80px] -bottom-[10%] left-[20%]"></div>
       
       <!-- Grain Overlay -->
-      <div class="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none grain-texture"></div>
+      <div class="absolute inset-0 opacity-[0.02] dark:opacity-[0.04] pointer-events-none grain-texture"></div>
     </div>
 
     <app-header></app-header>
@@ -52,7 +53,11 @@ export class App implements AfterViewInit {
   @ViewChild('blob3') blob3!: ElementRef;
   @ViewChild('cursorFollower') cursorFollower!: ElementRef;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+    if (isPlatformBrowser(this.platformId)) {
+      gsap.registerPlugin(ScrollTrigger);
+    }
+  }
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
@@ -74,19 +79,19 @@ export class App implements AfterViewInit {
     });
 
     gsap.ticker.add(() => {
-      currentX += (mouseX - currentX) * 0.12;
-      currentY += (mouseY - currentY) * 0.12;
+      currentX += (mouseX - currentX) * 0.1;
+      currentY += (mouseY - currentY) * 0.1;
       gsap.set(cursor, { x: currentX, y: currentY });
     });
 
-    const interactive = document.querySelectorAll('a, button, [appMagnetic]');
+    const interactive = document.querySelectorAll('a, button, [appMagnetic], .service-card, .project-card');
     interactive.forEach(el => {
       el.addEventListener('mouseenter', () => {
         gsap.to(cursor, {
-          scale: 1.8,
-          borderColor: 'rgba(99, 102, 241, 0.7)',
-          backgroundColor: 'rgba(99, 102, 241, 0.15)',
-          duration: 0.3,
+          scale: 2.2,
+          borderColor: 'rgba(99, 102, 241, 0.8)',
+          backgroundColor: 'rgba(99, 102, 241, 0.2)',
+          duration: 0.4,
           ease: 'power2.out',
         });
       });
@@ -95,7 +100,7 @@ export class App implements AfterViewInit {
           scale: 1,
           borderColor: 'rgba(99, 102, 241, 0.4)',
           backgroundColor: 'rgba(99, 102, 241, 0.05)',
-          duration: 0.3,
+          duration: 0.4,
           ease: 'power2.out',
         });
       });
@@ -103,34 +108,55 @@ export class App implements AfterViewInit {
   }
 
   private initBackgroundAnimations() {
-    const paths = [
-      { x: '25%', y: '15%', s: 1.1 },
-      { x: '10%', y: '30%', s: 0.9 },
-      { x: '-5%', y: '10%', s: 1.2 },
-      { x: '15%', y: '-10%', s: 0.95 },
+    const blobEls = [this.blob1.nativeElement, this.blob2.nativeElement, this.blob3.nativeElement];
+    const configs = [
+      { x: 22, y: 15, s: 1.1 },
+      { x: -8, y: 30, s: 0.85 },
+      { x: 5, y: -12, s: 1.2 },
     ];
 
-    [this.blob1, this.blob2, this.blob3].forEach((blob, i) => {
-      const path = paths[i % paths.length];
-      gsap.to(blob.nativeElement, {
-        x: path.x,
-        y: path.y,
-        scale: path.s,
-        duration: 18 + i * 4,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-        delay: i * 1.5,
+    blobEls.forEach((blob, i) => {
+      const c = configs[i];
+
+      // Main floating animation via timeline for organic feel
+      const tl = gsap.timeline({ repeat: -1, yoyo: true, ease: 'sine.inOut' });
+      tl.to(blob, {
+        x: `${c.x}%`,
+        y: `${c.y}%`,
+        scale: c.s,
+        duration: 14 + i * 5,
+      });
+      tl.to(blob, {
+        x: `${-c.x * 0.4}%`,
+        y: `${-c.y * 0.3}%`,
+        scale: 1 - (c.s - 1) * 0.5 + 1,
+        duration: 12 + i * 4,
       });
 
-      gsap.to(blob.nativeElement, {
+      // Opacity pulsing
+      gsap.to(blob, {
         opacity: 0.5,
         duration: 6 + i * 2,
         repeat: -1,
         yoyo: true,
         ease: 'sine.inOut',
-        delay: i,
+        delay: i * 1.5,
       });
     });
+
+    // Scroll parallax on the background container
+    const bg = blobEls[0].parentElement;
+    if (bg) {
+      gsap.to(bg, {
+        y: () => window.innerHeight * 0.04,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: document.body,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 2,
+        },
+      });
+    }
   }
 }

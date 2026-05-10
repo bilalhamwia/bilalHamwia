@@ -70,3 +70,44 @@ body.dark {
 ::-webkit-scrollbar-thumb {
   @apply bg-[#6366F1]/50 rounded-full hover:bg-[#6366F1];
 }
+
+/* Smooth reveal animation utility */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Image loading blur-up */
+img {
+  @apply transition-all duration-500;
+}
+
+img.loading {
+  @apply blur-sm scale-105;
+}
+
+img.loaded {
+  @apply blur-0 scale-100;
+}
+
+/* Spring-like transitions */
+.spring-transition {
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Smooth section spacing */
+section {
+  position: relative;
+}
+
+/* Prevent FOUC */
+[appScrollReveal] {
+  will-change: transform, opacity;
+}

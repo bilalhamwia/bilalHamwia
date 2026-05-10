@@ -3,6 +3,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { animate, inView } from 'framer-motion/dom';
+import { ScrollRevealDirective } from '../../shared/directives/scroll-reveal.directive';
 
 interface SocialLink {
   name: string;
@@ -13,34 +14,37 @@ interface SocialLink {
 @Component({
   selector: 'app-contact',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ScrollRevealDirective],
   template: `
-    <div class="py-24 max-w-7xl mx-auto px-6" #contactSection>
-      <div class="text-center mb-16">
-        <h2 class="text-4xl font-bold mb-4 gradient-text inline-block">Get In Touch</h2>
-        <p class="opacity-70 max-w-xl mx-auto text-lg">
+    <div class="py-24 md:py-32 max-w-7xl mx-auto px-6" #contactSection>
+      <div class="text-center mb-16" appScrollReveal revealType="springUp">
+        <h2 class="text-4xl md:text-5xl font-bold mb-4 gradient-text inline-block">Get In Touch</h2>
+        <p class="opacity-70 max-w-xl mx-auto text-lg leading-relaxed">
           Let's connect. Reach out through any of the platforms below.
         </p>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-5 max-w-3xl mx-auto" #socialGrid>
+      <div #socialGrid class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5 max-w-3xl mx-auto">
         <a *ngFor="let link of socialLinks; let i = index"
            [href]="link.url"
            target="_blank"
            rel="noopener noreferrer"
            class="social-card group relative overflow-hidden rounded-2xl p-8 flex flex-col items-center justify-center gap-4 cursor-pointer"
            [style.--hover-color]="link.color"
-           [attr.data-index]="i">
+           [attr.data-index]="i"
+           style="will-change: transform;">
+          
           <!-- Background hover fill -->
-          <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"
+          <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl scale-95 group-hover:scale-100 transition-all duration-500"
                [style.background]="link.color"></div>
 
           <!-- Glass base -->
           <div class="absolute inset-0 glass rounded-2xl group-hover:opacity-0 transition-opacity duration-500"></div>
 
-          <!-- SVG Icon (solid brand paths, always visible) -->
-          <div class="relative z-10 w-14 h-14 rounded-full flex items-center justify-center social-icon group-hover:bg-white/20"
-               [style.background]="'rgba(99,102,241,0.12)'">
+          <!-- Icon -->
+          <div class="relative z-10 w-14 h-14 rounded-full flex items-center justify-center social-icon group-hover:bg-white/20 transition-all duration-300"
+               [style.background]="'rgba(99,102,241,0.12)'"
+               style="will-change: transform;">
             <ng-container [ngSwitch]="link.name">
               <svg *ngSwitchCase="'GitHub'" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-primary-start group-hover:text-white dark:text-white">
                 <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
@@ -69,15 +73,16 @@ interface SocialLink {
           </span>
 
           <!-- Hover ring -->
-          <div class="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-white/20 transition-all duration-500"></div>
+          <div class="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-white/20 transition-all duration-500 scale-90 group-hover:scale-100"></div>
         </a>
       </div>
 
-      <div class="text-center mt-16">
-        <p class="text-sm opacity-50">or email me directly at</p>
+      <div class="text-center mt-16" appScrollReveal revealType="springUp">
+        <p class="text-sm opacity-50 mb-2">or email me directly at</p>
         <a href="mailto:bilal.hamwia1@gmail.com"
-           class="text-xl font-bold gradient-text hover:opacity-80 transition-opacity inline-block mt-1">
+           class="text-xl md:text-2xl font-bold gradient-text hover:opacity-80 transition-opacity inline-block relative group">
           bilal.hamwia1&#64;gmail.com
+          <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-primary-start to-primary-end group-hover:w-full transition-all duration-500"></span>
         </a>
       </div>
     </div>
@@ -89,7 +94,7 @@ interface SocialLink {
     }
     .social-card .social-icon {
       will-change: transform;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .social-card:hover .social-icon {
       transform: scale(1.15) rotate(-6deg);
@@ -118,7 +123,7 @@ export class ContactComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     if (this.isBrowser) {
       gsap.registerPlugin(ScrollTrigger);
-      setTimeout(() => this.initAnimations(), 100);
+      setTimeout(() => this.initCardAnimations(), 100);
     }
   }
 
@@ -126,24 +131,24 @@ export class ContactComponent implements AfterViewInit, OnDestroy {
     this.cleanupFns.forEach(fn => fn());
   }
 
-  private initAnimations() {
+  private initCardAnimations() {
     const cards = this.socialGrid.nativeElement.querySelectorAll('.social-card');
 
     const stopInView = inView(this.socialGrid.nativeElement, () => {
-      animate(cards, {
+      animate(cards as unknown as HTMLElement[], {
         scale: [0.8, 1],
         opacity: [0, 1],
         y: [30, 0],
       }, {
         duration: 0.5,
+        delay: 0.06,
         ease: [0.34, 1.56, 0.64, 1],
       });
-
       return () => {};
-    }, { amount: 0.3 });
+    }, { amount: 0.2 });
     this.cleanupFns.push(stopInView);
 
-    cards.forEach((card: HTMLElement, i: number) => {
+    cards.forEach((card: HTMLElement) => {
       card.addEventListener('mouseenter', () => {
         animate(card, {
           y: -8,

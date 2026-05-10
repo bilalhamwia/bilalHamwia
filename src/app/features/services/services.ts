@@ -2,33 +2,45 @@ import { Component, AfterViewInit, ElementRef, ViewChild, Inject, PLATFORM_ID } 
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { animate, inView } from 'framer-motion/dom';
+import { ScrollRevealDirective } from '../../shared/directives/scroll-reveal.directive';
 
 @Component({
   selector: 'app-services',
   standalone: true,
-  imports: [CommonModule],
-  styleUrl: './services.scss',
+  imports: [CommonModule, ScrollRevealDirective],
   template: `
-    <div class="py-24 bg-gray-50/50 dark:bg-black/20" #servicesContainer>
+    <div class="py-24 md:py-32 bg-gray-50/50 dark:bg-black/20" #servicesContainer>
       <div class="max-w-7xl mx-auto px-6">
-        <div class="text-center mb-16 services-header">
-          <h2 class="text-4xl font-bold mb-4 gradient-text inline-block">My Services</h2>
-          <p class="opacity-70 max-w-xl mx-auto text-lg">
+        <div class="text-center mb-16 md:mb-20" appScrollReveal revealType="springUp">
+          <h2 class="text-4xl md:text-5xl font-bold mb-4 gradient-text inline-block">My Services</h2>
+          <p class="opacity-70 max-w-xl mx-auto text-lg leading-relaxed">
             Providing specialized backend solutions to help businesses thrive with 
             scalable, secure, and performant architectures.
           </p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8 services-grid">
-          <div *ngFor="let service of services" 
-               class="glass p-10 rounded-[2.5rem] group hover:bg-primary-start cursor-default service-card">
-            <div class="w-16 h-16 glass rounded-2xl flex items-center justify-center text-4xl mb-8 group-hover:scale-110 transition-transform service-icon">
-              {{ service.icon }}
+        <div class="grid md:grid-cols-3 gap-6 md:gap-8 services-grid" appScrollReveal revealType="springUp" [revealStagger]="0.1" revealTarget=".service-card">
+          <div *ngFor="let service of services; let i = index" 
+               class="service-card group relative overflow-hidden rounded-[2.5rem] transition-all duration-500 cursor-default"
+               [style.transformStyle]="'preserve-3d'"
+               (mousemove)="onCardMove($event, i)"
+               (mouseleave)="onCardLeave(i)">
+            <!-- Hover gradient overlay -->
+            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-primary-start/20 via-primary-start/10 to-transparent rounded-[2.5rem]"></div>
+            
+            <!-- Card content -->
+            <div class="glass p-8 md:p-10 rounded-[2.5rem] relative z-10 h-full transition-all duration-500 group-hover:bg-primary-start/5"
+                 #serviceCard>
+              <div class="w-16 h-16 glass rounded-2xl flex items-center justify-center text-4xl mb-8 group-hover:scale-110 group-hover:rotate-[-6deg] transition-all duration-500 service-icon"
+                   style="will-change: transform;">
+                {{ service.icon }}
+              </div>
+              <h3 class="text-2xl font-bold mb-4 transition-colors duration-300 service-title">{{ service.title }}</h3>
+              <p class="opacity-70 leading-relaxed transition-colors duration-300">
+                {{ service.description }}
+              </p>
             </div>
-            <h3 class="text-2xl font-bold mb-4 group-hover:text-white transition-colors service-title">{{ service.title }}</h3>
-            <p class="opacity-70 group-hover:text-white/80 transition-colors leading-relaxed service-desc">
-              {{ service.description }}
-            </p>
           </div>
         </div>
       </div>
@@ -76,40 +88,42 @@ export class ServicesComponent implements AfterViewInit {
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
       gsap.registerPlugin(ScrollTrigger);
-      // Small timeout to ensure layout is settled
       setTimeout(() => {
-        this.initAnimations();
         ScrollTrigger.refresh();
-      }, 100);
+      }, 150);
     }
   }
 
-  private initAnimations() {
-    // Header reveal
-    gsap.from('.services-header', {
-      scrollTrigger: {
-        trigger: '.services-header',
-        start: 'top 90%',
-      },
-      y: 40,
-      opacity: 0,
-      duration: 1,
-      ease: 'power3.out'
-    });
+  onCardMove(e: MouseEvent, index: number) {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const cards = this.servicesContainer.nativeElement.querySelectorAll('.service-card');
+    const card = cards[index] as HTMLElement;
+    if (!card) return;
 
-    // Batch cards reveal
-    ScrollTrigger.batch('.service-card', {
-      onEnter: (elements) => gsap.from(elements, {
-        y: 60,
-        opacity: 0,
-        stagger: 0.15,
-        duration: 1.2,
-        ease: 'power4.out',
-        overwrite: true,
-        clearProps: 'all'
-      }),
-      start: 'top 85%',
-      once: true
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+    gsap.to(card, {
+      rotationY: x * 8,
+      rotationX: -y * 8,
+      transformPerspective: 1200,
+      duration: 0.5,
+      ease: 'power2.out',
+    });
+  }
+
+  onCardLeave(index: number) {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const cards = this.servicesContainer.nativeElement.querySelectorAll('.service-card');
+    const card = cards[index] as HTMLElement;
+    if (!card) return;
+
+    gsap.to(card, {
+      rotationY: 0,
+      rotationX: 0,
+      duration: 0.6,
+      ease: 'elastic.out(1, 0.4)',
     });
   }
 }
