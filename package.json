@@ -33,8 +33,11 @@
     "@angular/router": "^20.3.0",
     "@angular/ssr": "^20.3.13",
     "@openrouter/sdk": "^0.9.11",
+    "class-variance-authority": "^0.7.1",
     "express": "^5.1.0",
+    "framer-motion": "^12.38.0",
     "gsap": "^3.14.2",
+    "lucide-angular": "^1.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

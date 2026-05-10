@@ -1,16 +1,21 @@
-import { Component, AfterViewInit, ElementRef, ViewChild, Inject, PLATFORM_ID, OnDestroy, HostListener } from '@angular/core';
+import { Component, AfterViewInit, ElementRef, ViewChild, Inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { MagneticDirective } from '../../shared/directives/magnetic.directive';
+import { ProfileImageComponent } from '../../shared/components/profile-image/profile-image';
 
 @Component({
   selector: 'app-hero',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MagneticDirective, ProfileImageComponent],
   template: `
-    <div class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-      <!-- Background Shapes (Fallback/Additional depth) -->
-      <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-primary-start/10 rounded-full blur-3xl animate-pulse -z-10"></div>
-      <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary-end/10 rounded-full blur-3xl animate-pulse delay-1000 -z-10"></div>
+    <div #heroSection class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+      <!-- Parallax Layers -->
+      <div #parallaxBg class="absolute inset-0 -z-10">
+        <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-primary-start/10 rounded-full blur-3xl -z-10 parallax-layer" data-speed="0.3"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary-end/10 rounded-full blur-3xl -z-10 parallax-layer" data-speed="0.2"></div>
+      </div>
 
       <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center z-10 py-12 lg:py-0 w-full">
         <div #heroContent class="text-center lg:text-left order-2 lg:order-1 relative">
@@ -19,72 +24,74 @@ import { gsap } from 'gsap';
           </h2>
           
           <h1 class="text-4xl md:text-6xl lg:text-8xl font-black mb-6 leading-tight headline-text text-slate-900 dark:text-white">
-            <!-- Text content injected via TS for splitting -->
           </h1>
 
-          <p class="text-lg md:text-xl opacity-80 mb-10 max-w-lg mx-auto lg:mx-0 reveal-text">
-            Software Engineer and R&D Specialist crafting high-performance, 
-            visually stunning web applications with modern technologies.
+          <p #subtitleEl class="text-lg md:text-xl opacity-80 mb-10 max-w-lg mx-auto lg:mx-0 min-h-[2rem]">
           </p>
 
-          <!-- Social Icons with Liquid Morph -->
+          <!-- Social Icons with Magnetic Effect -->
           <div class="flex gap-6 justify-center lg:justify-start mb-10 social-icons">
-            <a href="https://github.com/bilalhamwia" class="w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-2xl hover:text-primary-start transition-colors social-icon" aria-label="GitHub">
-              <i class="fab fa-github">GH</i>
+            <a appMagnetic href="https://github.com/bilalhamwia" class="w-14 h-14 flex items-center justify-center glass rounded-full text-2xl hover:text-primary-start social-icon" aria-label="GitHub">
+              GH
             </a>
-            <a href="https://www.linkedin.com/in/bilal-hamwia0/" class="w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-2xl hover:text-primary-start transition-colors social-icon" aria-label="LinkedIn">
-              <i class="fab fa-linkedin">LI</i>
+            <a appMagnetic href="https://www.linkedin.com/in/bilal-hamwia0/" class="w-14 h-14 flex items-center justify-center glass rounded-full text-2xl hover:text-primary-start social-icon" aria-label="LinkedIn">
+              LI
             </a>
-            <a href="https://www.facebook.com/BilalHamwia/" class="w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-2xl hover:text-primary-start transition-colors social-icon" aria-label="Twitter">
-              <i class="fab fa-twitter">FB</i>
+            <a appMagnetic href="https://www.facebook.com/BilalHamwia/" class="w-14 h-14 flex items-center justify-center glass rounded-full text-2xl hover:text-primary-start social-icon" aria-label="Facebook">
+              FB
             </a>
-             <a href="https://www.instagram.com/bilal_hamwia/" class="w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-2xl hover:text-primary-start transition-colors social-icon" aria-label="Email">
-              <i class="fas fa-envelope">IG</i>
+             <a appMagnetic href="https://www.instagram.com/bilal_hamwia/" class="w-14 h-14 flex items-center justify-center glass rounded-full text-2xl hover:text-primary-start social-icon" aria-label="Instagram">
+              IG
             </a>
           </div>
 
           <div class="flex flex-wrap gap-4 justify-center lg:justify-start reveal-btn-group">
-            <button (click)="scrollTo('#portfolio')" class="px-8 py-3 rounded-full font-bold text-white transition-all duration-300 bg-primary-start hover:bg-primary-end hover:scale-105 shadow-lg relative z-20">
+            <button appMagnetic (click)="scrollTo('#portfolio')" class="px-8 py-3 rounded-full font-bold text-white transition-all duration-300 bg-primary-start hover:bg-primary-end hover:shadow-xl shadow-primary-start/20 relative z-20">
               View My Work
             </button>
-            <button (click)="scrollTo('#contact')" class="px-8 py-3 rounded-full font-bold border-2 border-primary-start hover:bg-primary-start/10 transition-colors glass-btn relative z-20">
+            <button appMagnetic (click)="scrollTo('#contact')" class="px-8 py-3 rounded-full font-bold border-2 border-primary-start hover:bg-primary-start/10 transition-colors glass-btn relative z-20">
               Contact Me
             </button>
-          </div>        </div>
+          </div>        
+        </div>
 
-        <div #heroImage class="relative order-1 lg:order-2 max-w-[300px] md:max-w-[450px] mx-auto lg:max-w-none">
-          <div class="glass p-3 md:p-4 rounded-3xl transform rotate-3 hover:rotate-0 transition-transform duration-500 hero-img-container">
-            <!-- Placeholder for Hero Image -->
-            <div class="bg-gradient-to-br from-primary-start to-primary-end w-full aspect-square rounded-2xl flex items-center justify-center text-8xl text-white shadow-2xl relative">
-              <!-- Profile Image -->        
-               <div class="w-full h-full rounded-2xl overflow-hidden shadow-2xl">    
-                <img src="images/profile.png" alt="Profile"    
-                class="w-full h-full object-cover">  
-              </div>
-            </div>
-          </div>
-          <!-- Decorative Elements -->
-          <div class="absolute -top-6 -right-6 md:-top-10 md:-right-10 w-16 h-16 md:w-20 md:h-20 glass rounded-full flex items-center justify-center text-xl md:text-2xl z-20 hero-decor decor-1">✨</div>
-          <div class="absolute -bottom-6 -left-6 md:-bottom-10 md:-left-10 w-20 h-20 md:w-24 md:h-24 glass rounded-full flex items-center justify-center text-2xl md:text-3xl z-20 hero-decor decor-2">💻</div>
+        <div class="order-1 lg:order-2 flex items-center justify-center">
+          <app-profile-image></app-profile-image>
         </div>
       </div>
     </div>
   `
 })
-export class HeroComponent implements AfterViewInit {
+export class HeroComponent implements AfterViewInit, OnDestroy {
+  @ViewChild('heroSection') heroSection!: ElementRef;
   @ViewChild('heroContent') heroContent!: ElementRef;
-  @ViewChild('heroImage') heroImage!: ElementRef;
+  @ViewChild('subtitleEl') subtitleEl!: ElementRef;
+
+  private roles = [
+    'Software Engineer & R&D Specialist',
+    'Java & Spring Boot Expert',
+    'Full-Stack Problem Solver',
+    'System Architecture Designer',
+  ];
+  private typeInterval: any;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
+      gsap.registerPlugin(ScrollTrigger);
       this.initSplitText();
-      // Use a small delay to ensure DOM is updated and GSAP can see the .char elements
       setTimeout(() => {
         this.initAnimations();
+        this.startTypewriter();
+        this.initParallax();
       }, 50);
     }
+  }
+
+  ngOnDestroy() {
+    if (this.typeInterval) clearInterval(this.typeInterval);
+    ScrollTrigger.getAll().forEach(t => t.kill());
   }
 
   private initSplitText() {
@@ -108,9 +115,8 @@ export class HeroComponent implements AfterViewInit {
         const charSpan = document.createElement('span');
         charSpan.textContent = char;
         charSpan.classList.add('char', 'inline-block');
-        // Set initial state via style to avoid flash
         charSpan.style.opacity = '0';
-        charSpan.style.transform = 'translateY(30px)';
+        charSpan.style.transform = 'translateY(30px) rotateX(40deg)';
         wordSpan.appendChild(charSpan);
       });
 
@@ -124,103 +130,103 @@ export class HeroComponent implements AfterViewInit {
     const socialIcons = this.heroContent.nativeElement.querySelectorAll('.social-icon');
 
     if (chars.length > 0) {
-      // 1. Text Reveal (Character by Character)
       tl.fromTo(chars, 
-        { y: 30, opacity: 0 },
+        { y: 30, opacity: 0, rotateX: 40 },
         { 
           y: 0, 
           opacity: 1, 
-          stagger: 0.03, 
-          duration: 0.8, 
-          ease: 'back.out(1.7)',
-          immediateRender: false,
-          clearProps: 'all'
+          rotateX: 0,
+          stagger: 0.025, 
+          duration: 0.6, 
+          ease: 'power3.out',
         }
       );
     }
 
-    // 2. Secondary Text Reveal
     tl.from('.reveal-text', {
-      y: 20,
+      y: 30,
       opacity: 0,
-      duration: 0.8,
-      stagger: 0.2,
+      duration: 0.5,
       ease: 'power2.out'
-    }, '-=0.5');
+    }, '-=0.3');
 
-    // 3. Social Icons Reveal
     tl.from(socialIcons, {
       scale: 0,
       opacity: 0,
-      stagger: 0.1,
-      duration: 0.6,
-      ease: 'elastic.out(1, 0.5)'
-    }, '-=0.4');
-
-    // 4. Buttons Reveal
-    tl.fromTo('.reveal-btn-group button', 
-      { y: 30, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        stagger: 0.1,
-        duration: 0.8,
-        ease: 'power3.out'
-      }, 
-    '-=0.4');
-
-    // 5. Image & Decor Reveal
-    const imageContainer = this.heroImage.nativeElement.querySelector('.hero-img-container');
-    tl.from(imageContainer, {
-      x: 50,
-      opacity: 0,
-      duration: 1,
-      ease: 'power3.out'
-    }, '-=0.8');
-
-    tl.to('.hero-decor', {
-      scale: 1,
-      opacity: 1,
-      duration: 0.6,
-      stagger: 0.15,
+      stagger: 0.06,
+      duration: 0.5,
       ease: 'back.out(1.7)'
-    }, '-=0.4');
+    }, '-=0.2');
 
-    // 6. Floating Animations
-    this.startFloatingAnimations();
-    this.start3DTiltEffect(imageContainer);
+    tl.fromTo('.reveal-btn-group button', 
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, stagger: 0.08, duration: 0.6, ease: 'power3.out' }, 
+      '-=0.3'
+    );
   }
 
-  private startFloatingAnimations() {
-    gsap.to('.decor-1', {
-      y: -15, rotation: 10, duration: 3, repeat: -1, yoyo: true, ease: 'sine.inOut'
-    });
-    gsap.to('.decor-2', {
-      y: 15, rotation: -10, duration: 4, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 0.5
-    });
-    gsap.to('.hero-img-container', {
-      y: -10, duration: 3.5, repeat: -1, yoyo: true, ease: 'sine.inOut'
-    });
+  private startTypewriter() {
+    const el = this.subtitleEl.nativeElement;
+    let roleIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+
+    const type = () => {
+      const currentRole = this.roles[roleIndex];
+
+      if (!isDeleting) {
+        el.textContent = currentRole.substring(0, charIndex + 1);
+        charIndex++;
+
+        if (charIndex === currentRole.length) {
+          isDeleting = true;
+          this.typeInterval = setTimeout(type, 2500);
+          return;
+        }
+      } else {
+        el.textContent = currentRole.substring(0, charIndex - 1);
+        charIndex--;
+
+        if (charIndex === 0) {
+          isDeleting = false;
+          roleIndex = (roleIndex + 1) % this.roles.length;
+          this.typeInterval = setTimeout(type, 500);
+          return;
+        }
+      }
+
+      this.typeInterval = setTimeout(type, isDeleting ? 40 : 60);
+    };
+
+    setTimeout(type, 1200);
   }
 
-  private start3DTiltEffect(element: HTMLElement) {
-    const container = this.heroImage.nativeElement;
-    container.addEventListener('mousemove', (e: MouseEvent) => {
-      const { left, top, width, height } = container.getBoundingClientRect();
-      const x = (e.clientX - left) / width - 0.5;
-      const y = (e.clientY - top) / height - 0.5;
-
-      gsap.to(element, {
-        rotationY: x * 15,
-        rotationX: -y * 15,
-        transformPerspective: 1000,
-        duration: 0.4,
-        ease: 'power2.out'
+  private initParallax() {
+    const layers = this.heroSection.nativeElement.querySelectorAll('.parallax-layer');
+    layers.forEach((layer: any) => {
+      const speed = parseFloat(layer.getAttribute('data-speed') || '0.2');
+      gsap.to(layer, {
+        y: () => window.innerHeight * speed * 0.15,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: this.heroSection.nativeElement,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 1.5,
+        },
       });
     });
 
-    container.addEventListener('mouseleave', () => {
-      gsap.to(element, { rotationY: 0, rotationX: 0, duration: 0.6, ease: 'power2.out' });
+    const content = this.heroContent.nativeElement;
+    gsap.to(content, {
+      y: () => window.innerHeight * 0.08,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: this.heroSection.nativeElement,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1,
+      },
     });
   }
 

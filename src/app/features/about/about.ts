@@ -2,11 +2,12 @@ import { Component, AfterViewInit, ElementRef, ViewChild, Inject, PLATFORM_ID, O
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { TiltDirective } from '../../shared/directives/tilt.directive';
 
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TiltDirective],
   template: `
     <div class="py-24 max-w-7xl mx-auto px-6 overflow-hidden" #aboutContainer>
       <div class="grid md:grid-cols-2 gap-16 items-start">
@@ -34,7 +35,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
           <div class="mb-10 education-section">
             <h3 class="text-2xl font-bold mb-6 gradient-text inline-block">Education</h3>
-            <div class="glass p-6 rounded-2xl border-l-4 border-primary-start hover:scale-[1.02] transition-transform duration-300">
+            <div #educationCard class="glass p-6 rounded-2xl border-l-4 border-primary-start group hover:scale-[1.02] transition-transform duration-300">
+              <div class="flex items-center gap-1 mb-2">
+                <span class="w-2 h-2 bg-primary-start rounded-full animate-pulse"></span>
+                <span class="w-2 h-2 bg-primary-start rounded-full animate-pulse" style="animation-delay: 0.3s"></span>
+                <span class="w-2 h-2 bg-primary-start rounded-full animate-pulse" style="animation-delay: 0.6s"></span>
+              </div>
               <h4 class="text-xl font-bold">Bachelor Degree in Information Technology</h4>
               <p class="text-primary-start font-semibold">Arab International University</p>
               <div class="flex justify-between items-center mt-2 opacity-70 text-sm">
@@ -44,20 +50,19 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
             </div>
           </div>
 
-
           <a href="assets/cv.pdf" download class="btn-primary about-btn inline-block">Download CV</a>
         </div>
 
         <div class="space-y-8" #skillsSection>
           <h3 class="text-2xl font-bold mb-6 skills-title">Technical Expertise</h3>
           
-          <div *ngFor="let skill of skills" class="space-y-2 skill-item">
+          <div *ngFor="let skill of skills; let i = index" class="space-y-2 skill-item">
             <div class="flex justify-between font-semibold">
               <span>{{ skill.name }}</span>
-              <span>{{ skill.level }}%</span>
+              <span #percentLabel>{{ skill.level }}%</span>
             </div>
-            <div class="h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
-              <div class="h-full bg-gradient-to-r from-primary-start to-primary-end skill-bar"
+            <div class="h-2.5 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-primary-start to-primary-end skill-bar rounded-full"
                    [attr.data-level]="skill.level"
                    style="width: 0%">
               </div>
@@ -65,10 +70,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
           </div>
 
           <div class="grid grid-cols-4 gap-4 mt-12 tech-grid">
-            <div *ngFor="let tech of techStack" 
-                 class="glass p-4 rounded-xl flex items-center justify-center text-3xl hover:scale-110 cursor-pointer tech-icon"
+            <div *ngFor="let tech of techStack" appTilt [tiltMax]="15" [tiltScale]="1.05"
+                 class="glass p-4 rounded-xl flex items-center justify-center text-3xl cursor-pointer tech-icon group"
                  [title]="tech.name">
-              {{ tech.icon }}
+              <span class="group-hover:scale-110 transition-transform duration-300">{{ tech.icon }}</span>
             </div>
           </div>
         </div>
@@ -79,6 +84,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 export class AboutComponent implements AfterViewInit, OnDestroy {
   @ViewChild('aboutContent') aboutContent!: ElementRef;
   @ViewChild('skillsSection') skillsSection!: ElementRef;
+  @ViewChild('educationCard') educationCard!: ElementRef;
 
   skills = [
     { name: 'Java / Spring Boot', level: 95 },
@@ -107,7 +113,6 @@ export class AboutComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
-      // Small delay to ensure DOM is fully rendered
       setTimeout(() => {
         this.initAnimations();
       }, 100);
@@ -115,12 +120,10 @@ export class AboutComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Kill all ScrollTriggers when component is destroyed
     ScrollTrigger.getAll().forEach(trigger => trigger.kill());
   }
 
   private initAnimations() {
-    // Left side reveal
     const leftTl = gsap.timeline({
       scrollTrigger: {
         trigger: this.aboutContent.nativeElement,
@@ -130,10 +133,10 @@ export class AboutComponent implements AfterViewInit, OnDestroy {
 
     leftTl.from('.about-title', { y: 30, opacity: 0, duration: 0.8, immediateRender: false })
           .from('.about-p', { y: 20, opacity: 0, duration: 0.8, immediateRender: false }, '-=0.4')
-          .from('.about-list > div', { x: -20, opacity: 0, stagger: 0.15, duration: 0.6, immediateRender: false }, '-=0.4')
+          .from('.about-list > div', { x: -20, opacity: 0, stagger: 0.12, duration: 0.6, immediateRender: false }, '-=0.4')
+          .from(this.educationCard.nativeElement, { y: 30, opacity: 0, duration: 0.6, immediateRender: false }, '-=0.2')
           .from('.about-btn', { scale: 0.8, opacity: 0, duration: 0.5, clearProps: 'all', immediateRender: false }, '-=0.2');
 
-    // Right side (Skills) reveal
     gsap.from('.skills-title', {
       scrollTrigger: { trigger: '.skills-title', start: 'top 90%' },
       opacity: 0,
@@ -141,10 +144,11 @@ export class AboutComponent implements AfterViewInit, OnDestroy {
       duration: 1
     });
 
-    // Skill bars animation
-    const skillBars = gsap.utils.toArray('.skill-bar');
-    skillBars.forEach((bar: any) => {
-      const level = bar.getAttribute('data-level');
+    const skillBars = gsap.utils.toArray('.skill-bar') as HTMLElement[];
+    const percentLabels = this.skillsSection.nativeElement.querySelectorAll('#percentLabel') || [];
+    
+    skillBars.forEach((bar, idx) => {
+      const level = parseInt(bar.getAttribute('data-level') || '0', 10);
       gsap.to(bar, {
         scrollTrigger: {
           trigger: bar,
@@ -152,11 +156,34 @@ export class AboutComponent implements AfterViewInit, OnDestroy {
         },
         width: `${level}%`,
         duration: 1.5,
-        ease: 'power3.out'
+        ease: 'power3.out',
+        onStart: () => {
+          const obj = { value: 0 };
+          gsap.to(obj, {
+            value: level,
+            duration: 1.5,
+            ease: 'power3.out',
+            onUpdate: () => {
+              percentLabels[idx].textContent = `${Math.round(obj.value)}%`;
+            },
+          });
+        },
       });
     });
 
-    // Tech icons - Staggered reveal
+    const skillItems = gsap.utils.toArray('.skill-item');
+    gsap.from(skillItems, {
+      scrollTrigger: {
+        trigger: '.skills-title',
+        start: 'top 85%',
+      },
+      x: -30,
+      opacity: 0,
+      stagger: 0.12,
+      duration: 0.6,
+      ease: 'power3.out',
+    });
+
     gsap.from('.tech-icon', {
       scrollTrigger: {
         trigger: '.tech-grid',
@@ -165,12 +192,11 @@ export class AboutComponent implements AfterViewInit, OnDestroy {
       },
       scale: 0,
       opacity: 0,
-      stagger: 0.08,
-      duration: 0.8,
+      stagger: 0.06,
+      duration: 0.6,
       ease: 'back.out(1.7)'
     });
 
-    // Refresh ScrollTrigger to ensure all positions are calculated correctly
     ScrollTrigger.refresh();
   }
 }

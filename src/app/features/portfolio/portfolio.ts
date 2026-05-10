@@ -1,5 +1,7 @@
-import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, signal, AfterViewInit, Inject, PLATFORM_ID, effect } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 interface Project {
   id: number;
@@ -29,9 +31,9 @@ interface Project {
 
       <!-- Filters -->
       <div class="flex flex-wrap justify-center gap-4 mb-12">
-        <button *ngFor="let filter of filters" 
-                (click)="activeFilter.set(filter)"
-                class="px-6 py-2 rounded-full font-semibold transition-all duration-300"
+        <button *ngFor="let filter of filters; let i = index" 
+                (click)="filterBy(filter)"
+                class="px-6 py-2 rounded-full font-semibold transition-all duration-300 filter-btn"
                 [class.bg-primary-start]="activeFilter() === filter"
                 [class.text-white]="activeFilter() === filter"
                 [class.glass]="activeFilter() !== filter">
@@ -40,38 +42,41 @@ interface Project {
       </div>
 
       <!-- Grid -->
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div *ngFor="let project of filteredProjects()" 
-             class="glass rounded-3xl overflow-hidden group hover:scale-[1.02] transition-all duration-500">
+      <div #projectGrid class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div *ngFor="let project of filteredProjects(); let i = index" 
+             class="glass rounded-3xl overflow-hidden group hover:scale-[1.03] hover:shadow-2xl transition-all duration-500 project-card"
+             [attr.data-index]="i">
           <div class="relative aspect-video overflow-hidden">
             <img *ngIf="project.image" [src]="project.image" [alt]="project.title" 
-                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
             <div *ngIf="!project.image" class="w-full h-full bg-gradient-to-br from-primary-start/40 to-primary-end/40 flex items-center justify-center text-4xl">
               🖼️
             </div>
-            <div class="absolute inset-0 bg-primary-start/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center gap-4 flex-wrap p-4">
-              <a *ngIf="project.githubUrl" [href]="project.githubUrl" target="_blank" 
-                 class="px-4 py-2 bg-white text-primary-start rounded-full font-bold hover:bg-opacity-90 transition-all text-sm">
-                {{ project.githubBackendUrl ? 'Frontend' : 'GitHub' }}
-              </a>
-              <a *ngIf="project.githubBackendUrl" [href]="project.githubBackendUrl" target="_blank" 
-                 class="px-4 py-2 bg-white text-primary-start rounded-full font-bold hover:bg-opacity-90 transition-all text-sm">
-                Backend
-              </a>
-              <a *ngIf="project.demoUrl" [href]="project.demoUrl" target="_blank" 
-                 class="px-4 py-2 border-2 border-white text-white rounded-full font-bold hover:bg-white hover:text-primary-start transition-all text-sm">
-                Demo
-              </a>
+            <div class="absolute inset-0 bg-gradient-to-t from-primary-start/90 via-primary-start/60 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end justify-center p-6">
+              <div class="flex gap-3 flex-wrap justify-center w-full">
+                <a *ngIf="project.githubUrl" [href]="project.githubUrl" target="_blank" 
+                   class="px-4 py-2 bg-white text-primary-start rounded-full font-bold hover:bg-opacity-90 transition-all text-sm transform hover:scale-105">
+                  {{ project.githubBackendUrl ? 'Frontend' : 'GitHub' }}
+                </a>
+                <a *ngIf="project.githubBackendUrl" [href]="project.githubBackendUrl" target="_blank" 
+                   class="px-4 py-2 bg-white text-primary-start rounded-full font-bold hover:bg-opacity-90 transition-all text-sm transform hover:scale-105">
+                  Backend
+                </a>
+                <a *ngIf="project.demoUrl" [href]="project.demoUrl" target="_blank" 
+                   class="px-4 py-2 border-2 border-white text-white rounded-full font-bold hover:bg-white hover:text-primary-start transition-all text-sm transform hover:scale-105">
+                  Demo
+                </a>
+              </div>
             </div>
           </div>
           <div class="p-6">
             <div class="flex justify-between items-start mb-2">
               <span class="text-xs font-bold uppercase tracking-wider text-primary-start">{{ project.category }}</span>
             </div>
-            <h3 class="text-2xl font-bold mb-4 group-hover:text-primary-start transition-colors">{{ project.title }}</h3>
-            <p class="opacity-70 text-sm mb-6 line-clamp-3">{{ project.description }}</p>
+            <h3 class="text-xl font-bold mb-3 group-hover:text-primary-start transition-colors">{{ project.title }}</h3>
+            <p class="opacity-70 text-sm mb-4 line-clamp-3">{{ project.description }}</p>
             <div class="flex flex-wrap gap-2">
-              <span *ngFor="let tag of project.tags" class="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-xs">
+              <span *ngFor="let tag of project.tags" class="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-xs tag-pill">
                 {{ tag }}
               </span>
             </div>
@@ -81,7 +86,7 @@ interface Project {
     </div>
   `
 })
-export class PortfolioComponent {
+export class PortfolioComponent implements AfterViewInit {
   filters = ['All', 'Web App', 'Desktop', 'Mobile'];
   activeFilter = signal('All');
 
@@ -172,6 +177,74 @@ export class PortfolioComponent {
       githubUrl: 'https://github.com/bilalhamwia/basic_calculater'
     }
   ];
+
+  private isBrowser: boolean;
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+    this.isBrowser = isPlatformBrowser(platformId);
+    if (this.isBrowser) {
+      gsap.registerPlugin(ScrollTrigger);
+    }
+  }
+
+  ngAfterViewInit() {
+    if (this.isBrowser) {
+      setTimeout(() => {
+        this.initAnimations();
+      }, 100);
+    }
+  }
+
+  filterBy(filter: string) {
+    this.activeFilter.set(filter);
+    if (this.isBrowser) {
+      setTimeout(() => this.animateCards(), 50);
+    }
+  }
+
+  private animateCards() {
+    const cards = document.querySelectorAll('.project-card');
+    gsap.fromTo(cards,
+      { y: 30, opacity: 0, scale: 0.95 },
+      {
+        y: 0,
+        opacity: 1,
+        scale: 1,
+        stagger: 0.08,
+        duration: 0.5,
+        ease: 'power3.out',
+      }
+    );
+  }
+
+  private initAnimations() {
+    gsap.from('.filter-btn', {
+      scrollTrigger: {
+        trigger: '.filter-btn',
+        start: 'top 90%',
+      },
+      y: 20,
+      opacity: 0,
+      stagger: 0.08,
+      duration: 0.5,
+      ease: 'power3.out',
+    });
+
+    this.animateCards();
+
+    const cards = document.querySelectorAll('.project-card');
+    cards.forEach((card) => {
+      const img = card.querySelector('img');
+      if (img) {
+        card.addEventListener('mouseenter', () => {
+          gsap.to(img, { scale: 1.1, duration: 0.6, ease: 'power2.out' });
+        });
+        card.addEventListener('mouseleave', () => {
+          gsap.to(img, { scale: 1, duration: 0.6, ease: 'power2.out' });
+        });
+      }
+    });
+  }
 
   filteredProjects() {
     return this.activeFilter() === 'All' 
