@@ -1,16 +1,17 @@
-import { Component, AfterViewInit, ElementRef, ViewChild, Inject, PLATFORM_ID, OnDestroy, HostListener } from '@angular/core';
+import { Component, AfterViewInit, ElementRef, ViewChild, Inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { gsap } from 'gsap';
+import { ClippedShapeGalleryComponent, MediaItem } from '../../shared/components/clipped-shape-gallery.component';
 
 @Component({
   selector: 'app-hero',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ClippedShapeGalleryComponent],
   template: `
     <div class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-      <!-- Background Shapes (Fallback/Additional depth) -->
-      <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-primary-start/10 rounded-full blur-3xl animate-pulse -z-10"></div>
-      <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary-end/10 rounded-full blur-3xl animate-pulse delay-1000 -z-10"></div>
+      <!-- Background Shapes (Bubbles) -->
+      <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-primary-start/20 rounded-full blur-3xl animate-pulse -z-10"></div>
+      <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary-end/20 rounded-full blur-3xl animate-pulse delay-1000 -z-10"></div>
 
       <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center z-10 py-12 lg:py-0 w-full">
         <div #heroContent class="text-center lg:text-left order-2 lg:order-1 relative">
@@ -18,54 +19,50 @@ import { gsap } from 'gsap';
             <span class="inline-block reveal-text">Hello, I'm</span>
           </h2>
           
-          <h1 class="text-4xl md:text-6xl lg:text-8xl font-black mb-6 leading-tight headline-text text-slate-900 dark:text-white">
+          <h1 class="text-4xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight headline-text text-slate-900 dark:text-white">
             <!-- Text content injected via TS for splitting -->
           </h1>
 
-          <p class="text-lg md:text-xl opacity-80 mb-10 max-w-lg mx-auto lg:mx-0 reveal-text">
+          <p class="text-lg md:text-xl opacity-80 mb-10 max-w-lg mx-auto lg:mx-0 reveal-text text-slate-600 dark:text-slate-400">
             Software Engineer and R&D Specialist crafting high-performance, 
             visually stunning web applications with modern technologies.
           </p>
 
-          <!-- Social Icons with Liquid Morph -->
+          <!-- Social Icons -->
           <div class="flex gap-6 justify-center lg:justify-start mb-10 social-icons">
-            <a href="https://github.com/bilalhamwia" class="w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-2xl hover:text-primary-start transition-colors social-icon" aria-label="GitHub">
-              <i class="fab fa-github">GH</i>
+            <a href="https://github.com/bilalhamwia" target="_blank" class="w-12 h-12 flex items-center justify-center bg-slate-100 dark:bg-white/10 backdrop-blur-md border border-slate-200 dark:border-white/20 rounded-full text-xl hover:text-primary-start transition-colors social-icon" aria-label="GitHub">
+              GH
             </a>
-            <a href="https://www.linkedin.com/in/bilal-hamwia0/" class="w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-2xl hover:text-primary-start transition-colors social-icon" aria-label="LinkedIn">
-              <i class="fab fa-linkedin">LI</i>
+            <a href="https://www.linkedin.com/in/bilal-hamwia0/" target="_blank" class="w-12 h-12 flex items-center justify-center bg-slate-100 dark:bg-white/10 backdrop-blur-md border border-slate-200 dark:border-white/20 rounded-full text-xl hover:text-primary-start transition-colors social-icon" aria-label="LinkedIn">
+              LI
             </a>
-            <a href="https://www.facebook.com/BilalHamwia/" class="w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-2xl hover:text-primary-start transition-colors social-icon" aria-label="Twitter">
-              <i class="fab fa-twitter">FB</i>
+            <a href="https://www.facebook.com/BilalHamwia/" target="_blank" class="w-12 h-12 flex items-center justify-center bg-slate-100 dark:bg-white/10 backdrop-blur-md border border-slate-200 dark:border-white/20 rounded-full text-xl hover:text-primary-start transition-colors social-icon" aria-label="Facebook">
+              FB
             </a>
-             <a href="https://www.instagram.com/bilal_hamwia/" class="w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-2xl hover:text-primary-start transition-colors social-icon" aria-label="Email">
-              <i class="fas fa-envelope">IG</i>
+            <a href="https://www.instagram.com/bilal_hamwia/" target="_blank" class="w-12 h-12 flex items-center justify-center bg-slate-100 dark:bg-white/10 backdrop-blur-md border border-slate-200 dark:border-white/20 rounded-full text-xl hover:text-primary-start transition-colors social-icon" aria-label="Instagram">
+              IG
             </a>
           </div>
 
           <div class="flex flex-wrap gap-4 justify-center lg:justify-start reveal-btn-group">
-            <button (click)="scrollTo('#portfolio')" class="px-8 py-3 rounded-full font-bold text-white transition-all duration-300 bg-primary-start hover:bg-primary-end hover:scale-105 shadow-lg relative z-20">
+            <button (click)="scrollTo('#portfolio')" class="px-8 py-3 rounded-full font-bold text-white transition-all duration-300 bg-primary-start hover:bg-primary-end hover:scale-105 shadow-lg relative z-30">
               View My Work
             </button>
-            <button (click)="scrollTo('#contact')" class="px-8 py-3 rounded-full font-bold border-2 border-primary-start hover:bg-primary-start/10 transition-colors glass-btn relative z-20">
+            <button (click)="scrollTo('#contact')" class="px-8 py-3 rounded-full font-bold border-2 border-primary-start text-primary-start dark:text-white hover:bg-primary-start/10 transition-colors relative z-30">
               Contact Me
             </button>
-          </div>        </div>
-
-        <div #heroImage class="relative order-1 lg:order-2 max-w-[300px] md:max-w-[450px] mx-auto lg:max-w-none">
-          <div class="glass p-3 md:p-4 rounded-3xl transform rotate-3 hover:rotate-0 transition-transform duration-500 hero-img-container">
-            <!-- Placeholder for Hero Image -->
-            <div class="bg-gradient-to-br from-primary-start to-primary-end w-full aspect-square rounded-2xl flex items-center justify-center text-8xl text-white shadow-2xl relative">
-              <!-- Profile Image -->        
-               <div class="w-full h-full rounded-2xl overflow-hidden shadow-2xl">    
-                <img src="images/profile.png" alt="Profile"    
-                class="w-full h-full object-cover">  
-              </div>
-            </div>
           </div>
-          <!-- Decorative Elements -->
-          <div class="absolute -top-6 -right-6 md:-top-10 md:-right-10 w-16 h-16 md:w-20 md:h-20 glass rounded-full flex items-center justify-center text-xl md:text-2xl z-20 hero-decor decor-1">✨</div>
-          <div class="absolute -bottom-6 -left-6 md:-bottom-10 md:-left-10 w-20 h-20 md:w-24 md:h-24 glass rounded-full flex items-center justify-center text-2xl md:text-3xl z-20 hero-decor decor-2">💻</div>
+        </div>
+
+        <div #heroImage class="relative order-1 lg:order-2 max-w-[280px] md:max-w-[380px] lg:max-w-[420px] mx-auto">
+          <div class="hero-img-container">
+            <!-- Clipped Shape Profile Image -->
+            <app-clipped-shape-gallery 
+              [items]="profileImage" 
+              [columns]="1"
+              className="w-full aspect-[4/5]">
+            </app-clipped-shape-gallery>
+          </div>
         </div>
       </div>
     </div>
@@ -75,15 +72,23 @@ export class HeroComponent implements AfterViewInit {
   @ViewChild('heroContent') heroContent!: ElementRef;
   @ViewChild('heroImage') heroImage!: ElementRef;
 
+  profileImage: MediaItem[] = [
+    {
+      src: 'images/profile.png',
+      alt: 'Bilal Hamwia Profile',
+      clipId: 'clip-another1',
+      type: 'image'
+    }
+  ];
+
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
       this.initSplitText();
-      // Use a small delay to ensure DOM is updated and GSAP can see the .char elements
       setTimeout(() => {
         this.initAnimations();
-      }, 50);
+      }, 100);
     }
   }
 
@@ -98,7 +103,7 @@ export class HeroComponent implements AfterViewInit {
     
     words.forEach((word) => {
       const wordSpan = document.createElement('span');
-      wordSpan.classList.add('inline-block', 'mr-3', 'whitespace-nowrap');
+      wordSpan.classList.add('inline-block', 'mr-3');
       
       if (word.toLowerCase().includes('products')) {
         wordSpan.classList.add('text-primary-start');
@@ -108,9 +113,8 @@ export class HeroComponent implements AfterViewInit {
         const charSpan = document.createElement('span');
         charSpan.textContent = char;
         charSpan.classList.add('char', 'inline-block');
-        // Set initial state via style to avoid flash
         charSpan.style.opacity = '0';
-        charSpan.style.transform = 'translateY(30px)';
+        charSpan.style.transform = 'translateY(20px)';
         wordSpan.appendChild(charSpan);
       });
 
@@ -119,86 +123,63 @@ export class HeroComponent implements AfterViewInit {
   }
 
   private initAnimations() {
-    const tl = gsap.timeline();
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
     const chars = this.heroContent.nativeElement.querySelectorAll('.char');
+    const revealTexts = this.heroContent.nativeElement.querySelectorAll('.reveal-text');
     const socialIcons = this.heroContent.nativeElement.querySelectorAll('.social-icon');
+    const buttons = this.heroContent.nativeElement.querySelectorAll('.reveal-btn-group button');
 
+    // 1. Text Reveal (Characters)
     if (chars.length > 0) {
-      // 1. Text Reveal (Character by Character)
-      tl.fromTo(chars, 
-        { y: 30, opacity: 0 },
-        { 
-          y: 0, 
-          opacity: 1, 
-          stagger: 0.03, 
-          duration: 0.8, 
-          ease: 'back.out(1.7)',
-          immediateRender: false,
-          clearProps: 'all'
-        }
-      );
+      tl.to(chars, { 
+        y: 0, 
+        opacity: 1, 
+        stagger: 0.02, 
+        duration: 0.8, 
+        ease: 'back.out(1.7)'
+      });
     }
 
-    // 2. Secondary Text Reveal
-    tl.from('.reveal-text', {
+    // 2. Reveal Texts (Hello & Description)
+    tl.from(revealTexts, {
       y: 20,
       opacity: 0,
       duration: 0.8,
-      stagger: 0.2,
-      ease: 'power2.out'
-    }, '-=0.5');
+      stagger: 0.1
+    }, '-=0.6');
 
-    // 3. Social Icons Reveal
+    // 3. Social Icons
     tl.from(socialIcons, {
       scale: 0,
       opacity: 0,
-      stagger: 0.1,
+      stagger: 0.05,
       duration: 0.6,
-      ease: 'elastic.out(1, 0.5)'
-    }, '-=0.4');
-
-    // 4. Buttons Reveal
-    tl.fromTo('.reveal-btn-group button', 
-      { y: 30, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        stagger: 0.1,
-        duration: 0.8,
-        ease: 'power3.out'
-      }, 
-    '-=0.4');
-
-    // 5. Image & Decor Reveal
-    const imageContainer = this.heroImage.nativeElement.querySelector('.hero-img-container');
-    tl.from(imageContainer, {
-      x: 50,
-      opacity: 0,
-      duration: 1,
-      ease: 'power3.out'
-    }, '-=0.8');
-
-    tl.to('.hero-decor', {
-      scale: 1,
-      opacity: 1,
-      duration: 0.6,
-      stagger: 0.15,
       ease: 'back.out(1.7)'
     }, '-=0.4');
 
-    // 6. Floating Animations
-    this.startFloatingAnimations();
-    this.start3DTiltEffect(imageContainer);
+    // 4. Buttons (View My Work & Contact)
+    tl.fromTo(buttons, 
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, stagger: 0.1, duration: 0.6 },
+      '-=0.4'
+    );
+
+    // 5. Image Reveal
+    const imageContainer = this.heroImage.nativeElement.querySelector('.hero-img-container');
+    if (imageContainer) {
+      tl.from(imageContainer, {
+        x: 50,
+        opacity: 0,
+        duration: 1,
+      }, '-=0.8');
+
+      this.startFloatingAnimations(imageContainer);
+      this.start3DTiltEffect(imageContainer);
+    }
   }
 
-  private startFloatingAnimations() {
-    gsap.to('.decor-1', {
-      y: -15, rotation: 10, duration: 3, repeat: -1, yoyo: true, ease: 'sine.inOut'
-    });
-    gsap.to('.decor-2', {
-      y: 15, rotation: -10, duration: 4, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 0.5
-    });
-    gsap.to('.hero-img-container', {
+  private startFloatingAnimations(element: HTMLElement) {
+    gsap.to(element, {
       y: -10, duration: 3.5, repeat: -1, yoyo: true, ease: 'sine.inOut'
     });
   }
@@ -229,8 +210,8 @@ export class HeroComponent implements AfterViewInit {
       const element = document.querySelector(selector);
       if (element) {
         const headerOffset = 80;
-        const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition = elementPosition - headerOffset;
 
         window.scrollTo({
           top: offsetPosition,

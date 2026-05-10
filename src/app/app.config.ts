@@ -1,7 +1,8 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
+import { LucideAngularModule, ArrowRight, Coffee, Database, Server, GitBranch, Layers, Cpu, Globe, Code } from 'lucide-angular';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
@@ -9,6 +10,17 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
-    provideAnimationsAsync()
+    provideAnimationsAsync(),
+    importProvidersFrom(LucideAngularModule.pick({ 
+      ArrowRight, 
+      Coffee, 
+      Database, 
+      Server, 
+      GitBranch, 
+      Layers, 
+      Cpu, 
+      Globe, 
+      Code 
+    }))
   ]
 };
